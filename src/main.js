@@ -3,6 +3,7 @@ import { SortView } from './view/sort-view.js';
 import { ListView } from './view/list-view.js';
 import { ListItemView } from './view/list-item-view.js';
 import { PointEditView } from './view/point-edit-view.js';
+import { OfferView} from './view/offer-view.js';
 import { render, RenderPosition } from './render.js';
 
 const ENTRY_COUNT = 3;
@@ -23,3 +24,7 @@ for (let i = 0; i < ENTRY_COUNT; i++) {
 const changingEventItem = eventsList.querySelectorAll('.trip-events__item')[CHANGING_ENTRY];
 
 render(new PointEditView(), changingEventItem, RenderPosition.AFTERBEGIN);
+
+const eventsDetails = eventsList.querySelector('.event__details');
+
+render(new OfferView(), eventsDetails);

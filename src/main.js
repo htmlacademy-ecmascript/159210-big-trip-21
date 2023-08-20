@@ -4,6 +4,7 @@ import { ListView } from './view/list-view.js';
 import { ListItemView } from './view/list-item-view.js';
 import { PointEditView } from './view/point-edit-view.js';
 import { OfferView} from './view/offer-view.js';
+import { DestinationView } from './view/destination-view.js';
 import { render, RenderPosition } from './render.js';
 
 const ENTRY_COUNT = 3;
@@ -28,3 +29,4 @@ render(new PointEditView(), changingEventItem, RenderPosition.AFTERBEGIN);
 const eventsDetails = eventsList.querySelector('.event__details');
 
 render(new OfferView(), eventsDetails);
+render(new DestinationView(), eventsDetails);

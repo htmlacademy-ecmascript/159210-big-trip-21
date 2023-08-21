@@ -1,32 +1,44 @@
-import { FilterView } from '../view/filter-view.js';
+import { ENTRY_COUNT } from '../const.js';
 import { SortView } from '../view/sort-view.js';
 import { ListView } from '../view/list-view.js';
+import { EventLineView } from '../view/event-line-view.js';
+import { EventEditView } from '../view/event-edit-view.js';
 import { ListItemView } from '../view/list-item-view.js';
-import { PointEditView } from '../view/point-edit-view.js';
-import { OfferView } from '../view/offer-view.js';
-import { DestinationView } from '../view/destination-view.js';
-import { render, RenderPosition } from '../render.js';
+import { EventHeaderView } from '../view/event-header-view.js';
+import { EventDetailsView } from '../view/event-details-view.js';
+import { EventOfferView } from '../view/event-offer-view.js';
+import { EventDestinationView } from '../view/event-destination-view.js';
+import { render } from '../render.js';
 
-const ENTRY_COUNT = 3;
-const CHANGING_ENTRY = 0;
+class PagePresenter {
+  sortComponent = new SortView();
+  listComponent = new ListView();
 
-const filtersContainer = document.querySelector('.trip-controls__filters');
-const tripEvents = document.querySelector('.trip-events');
+  constructor ({container}) {
+    this.container = container;
+  }
 
-render(new FilterView(), filtersContainer);
-render(new SortView(), tripEvents);
-render(new ListView(), tripEvents);
+  init() {
+    const editingItem = new ListItemView();
+    const editingForm = new EventEditView();
+    const editingDetails = new EventDetailsView();
 
-const eventsList = tripEvents.querySelector('.trip-events__list');
+    render(this.sortComponent, this.container);
+    render(this.listComponent, this.container);
 
-for (let i = 0; i < ENTRY_COUNT; i++) {
-  render(new ListItemView(), eventsList);
+    render(editingItem, this.listComponent.getElement());
+    render(editingForm, editingItem.getElement());
+    render(new EventHeaderView, editingForm.getElement());
+    render(editingDetails, editingForm.getElement());
+    render(new EventOfferView, editingDetails.getElement());
+    render(new EventDestinationView, editingDetails.getElement());
+
+    for (let i = 0; i < ENTRY_COUNT; i++) {
+      const newItem = new ListItemView();
+      render(newItem, this.listComponent.getElement());
+      render(new EventLineView, newItem.getElement());
+    }
+  }
 }
-const changingEventItem = eventsList.querySelectorAll('.trip-events__item')[CHANGING_ENTRY];
 
-render(new PointEditView(), changingEventItem, RenderPosition.AFTERBEGIN);
-
-const eventsDetails = eventsList.querySelector('.event__details');
-
-render(new OfferView(), eventsDetails);
-render(new DestinationView(), eventsDetails);
+export {PagePresenter};

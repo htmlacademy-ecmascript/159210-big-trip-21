@@ -19,7 +19,7 @@ function createDestinationTemplate() {
   );
 }
 
-class DestinationView {
+class EventDestinationView {
   getTemplate() {
     return createDestinationTemplate();
   }
@@ -37,4 +37,4 @@ class DestinationView {
   }
 }
 
-export { DestinationView };
+export { EventDestinationView };

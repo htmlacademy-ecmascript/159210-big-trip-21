@@ -1,18 +1,26 @@
+import { DESTINATIONS, PHOTOS_BORDER_NUMS, PHOTOS_COUNT, PHOTOS_SRC } from '../const.js';
 import { createElement } from '../render.js';
+import { getRandomInteger } from '../utils.js';
 
-function createDestinationTemplate() {
+function createPhotos() {
+  const count = getRandomInteger(PHOTOS_COUNT.min, PHOTOS_COUNT.max);
+  let photos = '';
+  for (let i = 0; i < count; i++) {
+    photos += `<img class="event__photo" src="${PHOTOS_SRC}${getRandomInteger(PHOTOS_BORDER_NUMS.min, PHOTOS_BORDER_NUMS.max)}" alt="Event photo">\n`;
+  }
+
+  return photos;
+}
+
+function createDestinationTemplate({ destination }) {
   return (
     `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">Geneva is a city in Switzerland that lies at the southern tip of expansive Lac Léman (Lake Geneva). Surrounded by the Alps and Jura mountains, the city has views of dramatic Mont Blanc.</p>
+      <p class="event__destination-description">${DESTINATIONS[destination]}</p>
 
       <div class="event__photos-container">
         <div class="event__photos-tape">
-          <img class="event__photo" src="img/photos/1.jpg" alt="Event photo">
-          <img class="event__photo" src="img/photos/2.jpg" alt="Event photo">
-          <img class="event__photo" src="img/photos/3.jpg" alt="Event photo">
-          <img class="event__photo" src="img/photos/4.jpg" alt="Event photo">
-          <img class="event__photo" src="img/photos/5.jpg" alt="Event photo">
+          ${createPhotos()}
         </div>
       </div>
     </section>`
@@ -20,8 +28,12 @@ function createDestinationTemplate() {
 }
 
 class EventDestinationView {
+  constructor (event) {
+    this.event = event;
+  }
+
   getTemplate() {
-    return createDestinationTemplate();
+    return createDestinationTemplate(this.event);
   }
 
   getElement() {

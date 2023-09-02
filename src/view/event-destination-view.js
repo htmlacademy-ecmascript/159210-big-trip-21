@@ -29,7 +29,7 @@ function createDestinationTemplate({ destination }) {
 
 class EventDestinationView {
   constructor (event) {
-    this.event = event.entry;
+    this.event = event;
   }
 
   getTemplate() {

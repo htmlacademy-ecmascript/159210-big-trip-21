@@ -30,7 +30,7 @@ function createOfferTemplate(event) {
 
 class EventOfferView {
   constructor (event) {
-    this.event = event.entry;
+    this.event = event;
   }
 
   getTemplate() {

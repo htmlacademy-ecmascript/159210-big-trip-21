@@ -73,7 +73,7 @@ function createEventHeaderTemplate({ eventType, price, destination, startTime, e
 
 class EventHeaderView {
   constructor(event) {
-    this.event = event.entry;
+    this.event = event;
   }
 
   getTemplate() {

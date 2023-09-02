@@ -1,11 +1,8 @@
-import { EVENT_TYPES, ENTRY_COUNT, DESTINATIONS } from '../const.js';
+import { EVENT_TYPES, DESTINATIONS, MAX_PRICE, MIN_PRICE, OFFERS } from '../const.js';
 import { getRandomInteger, getRandomArrayElement, getRandomBoolean, getRandomKey, formalizeTime } from '../utils.js';
-import { MAX_PRICE, MIN_PRICE, OFFERS } from '../const.js';
-import { EventLineView } from '../view/event-line-view.js';
 import dayjs from 'dayjs';
 import dayjsRandom from 'dayjs-random';
 import dayOfYear from 'dayjs/plugin/dayOfYear';
-
 
 dayjs.extend(dayjsRandom);
 dayjs.extend(dayOfYear);
@@ -55,12 +52,4 @@ function getNewEntry() {
   };
 }
 
-function getArrayOfEvents() {
-  const newArray = [];
-  for (let i = 0; i < ENTRY_COUNT; i++) {
-    newArray.push(new EventLineView);
-  }
-  return newArray;
-}
-
-export { getNewEntry, getArrayOfEvents };
+export { getNewEntry };

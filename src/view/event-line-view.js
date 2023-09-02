@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 import { OFFERS, OFFERS_PRICES, DATE_FORMAT, MAX_TIME } from '../const.js';
-import { getNewEntry } from '../mock/event.js';
 import { createElement } from '../render.js';
 
 let isDeacreaseNeeded = false;
@@ -80,8 +79,8 @@ function createEventTemplate({ date, eventType, destination, startTime, price, o
 }
 
 class EventLineView {
-  constructor () {
-    this.entry = getNewEntry();
+  constructor (entry) {
+    this.entry = entry;
   }
 
   getTemplate() {

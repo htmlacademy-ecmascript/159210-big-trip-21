@@ -5,13 +5,7 @@ const getRandomInteger = (a, b) => {
   return Math.floor(result);
 };
 
-const formalizeTime = (num) => {
-  if (num < 10) {
-    return `0${num}`;
-  } else {
-    return `${num}`;
-  }
-};
+const formalizeTime = (num) => num < 10 ? `0${num}` : `${num}`;
 
 const getRandomArrayElement = (elements) => elements[getRandomInteger(0, elements.length - 1)];
 
@@ -21,10 +15,10 @@ const getRandomKey = (obj) => Object.keys(obj)[getRandomInteger(0, Object.keys(o
 
 const sortByDate = (arrayOfObjects) => {
   const newArray = arrayOfObjects.sort((a, b) => {
-    if (Date.parse(a.entry.date) < Date.parse(b.entry.date)) {
+    if (Date.parse(a.date) < Date.parse(b.date)) {
       return -1;
     }
-    if (Date.parse(a.entry.date) > Date.parse(b.entry.date)) {
+    if (Date.parse(a.date) > Date.parse(b.date)) {
       return 1;
     }
     return 0;

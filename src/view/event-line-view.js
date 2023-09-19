@@ -80,13 +80,23 @@ function createEventTemplate({ date, eventType, destination, startTime, price, o
 
 export default class EventLineView extends AbstractView {
   #event = null;
+  #onEditClick = null;
 
-  constructor (event) {
+  constructor ({ event, onEditClick}) {
     super();
     this.#event = event;
+    this.#onEditClick = onEditClick;
+
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#editClickHandler);
   }
 
   get template() {
     return createEventTemplate(this.#event);
   }
+
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onEditClick();
+  };
 }

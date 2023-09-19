@@ -1,5 +1,5 @@
 import { DEFAULT_FILTER, SORT_EVENTS } from '../const.js';
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createEmptyListTemplate(filter = DEFAULT_FILTER) {
   return (
@@ -9,26 +9,15 @@ function createEmptyListTemplate(filter = DEFAULT_FILTER) {
   );
 }
 
-class EmptyListView {
+export default class EmptyListView extends AbstractView {
+  #filter = null;
+
   constructor (filter) {
-    this.filter = filter;
+    super();
+    this.#filter = filter;
   }
 
-  getTemplate() {
-    return createEmptyListTemplate(this.filter);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  deleteElement() {
-    this.element.remove();
+  get template() {
+    return createEmptyListTemplate(this.#filter);
   }
 }
-
-export { EmptyListView };

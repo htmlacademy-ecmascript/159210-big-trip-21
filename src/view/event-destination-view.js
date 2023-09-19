@@ -1,5 +1,5 @@
 import { DESTINATIONS, PHOTOS_BORDER_NUMS, PHOTOS_COUNT, PHOTOS_SRC } from '../const.js';
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { getRandomInteger } from '../utils.js';
 
 function createPhotos() {
@@ -27,26 +27,15 @@ function createDestinationTemplate({ destination }) {
   );
 }
 
-class EventDestinationView {
+export default class EventDestinationView extends AbstractView {
+  #event = null;
+
   constructor (event) {
-    this.event = event;
+    super();
+    this.#event = event;
   }
 
-  getTemplate() {
-    return createDestinationTemplate(this.event);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  deleteElement() {
-    this.element.remove();
+  get template() {
+    return createDestinationTemplate(this.#event);
   }
 }
-
-export { EventDestinationView };

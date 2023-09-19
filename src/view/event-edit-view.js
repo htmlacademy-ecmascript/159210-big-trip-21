@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createPointEditTemplate() {
   return (
@@ -7,22 +7,8 @@ function createPointEditTemplate() {
   );
 }
 
-class EventEditView {
-  getTemplate() {
+export default class EventEditView extends AbstractView {
+  get template() {
     return createPointEditTemplate();
   }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  deleteElement() {
-    this.element.remove();
-  }
 }
-
-export {EventEditView};

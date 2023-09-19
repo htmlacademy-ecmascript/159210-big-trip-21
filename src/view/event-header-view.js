@@ -1,6 +1,6 @@
 import { DESTINATIONS, EDIT_DATE_FORMAT, EVENT_TYPES } from '../const.js';
-import { createElement } from '../render.js';
 import dayjs from 'dayjs';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createEventTypeItems () {
   let itemsList = '';
@@ -71,26 +71,15 @@ function createEventHeaderTemplate({ eventType, price, destination, startTime, e
   );
 }
 
-class EventHeaderView {
+export default class EventHeaderView extends AbstractView {
+  #event = null;
+
   constructor(event) {
-    this.event = event;
+    super();
+    this.#event = event;
   }
 
-  getTemplate() {
-    return createEventHeaderTemplate(this.event);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  deleteElement() {
-    this.element.remove();
+  get template() {
+    return createEventHeaderTemplate(this.#event);
   }
 }
-
-export { EventHeaderView };

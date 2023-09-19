@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { OFFERS, OFFERS_PRICES, DATE_FORMAT, MAX_TIME } from '../const.js';
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 let isDeacreaseNeeded = false;
 
@@ -78,26 +78,15 @@ function createEventTemplate({ date, eventType, destination, startTime, price, o
   );
 }
 
-class EventLineView {
+export default class EventLineView extends AbstractView {
+  #entry = null;
+
   constructor (entry) {
-    this.entry = entry;
+    super();
+    this.#entry = entry;
   }
 
-  getTemplate() {
-    return createEventTemplate(this.entry);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  deleteElement() {
-    this.element.remove();
+  get template() {
+    return createEventTemplate(this.#entry);
   }
 }
-
-export { EventLineView };

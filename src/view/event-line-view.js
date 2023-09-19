@@ -79,14 +79,14 @@ function createEventTemplate({ date, eventType, destination, startTime, price, o
 }
 
 export default class EventLineView extends AbstractView {
-  #entry = null;
+  #event = null;
 
-  constructor (entry) {
+  constructor (event) {
     super();
-    this.#entry = entry;
+    this.#event = event;
   }
 
   get template() {
-    return createEventTemplate(this.#entry);
+    return createEventTemplate(this.#event);
   }
 }

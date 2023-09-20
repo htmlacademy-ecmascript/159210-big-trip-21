@@ -1,6 +1,6 @@
 import { DESTINATIONS, PHOTOS_BORDER_NUMS, PHOTOS_COUNT, PHOTOS_SRC } from '../const.js';
 import AbstractView from '../framework/view/abstract-view.js';
-import { getRandomInteger } from '../utils.js';
+import { getRandomInteger } from '../utils/common.js';
 
 function createPhotos() {
   const count = getRandomInteger(PHOTOS_COUNT.min, PHOTOS_COUNT.max);

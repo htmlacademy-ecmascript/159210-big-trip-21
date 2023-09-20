@@ -1,5 +1,5 @@
 import { EVENT_TYPES, DESTINATIONS, MAX_PRICE, MIN_PRICE, OFFERS } from '../const.js';
-import { getRandomInteger, getRandomArrayElement, getRandomBoolean, getRandomKey, formalizeTime } from '../utils.js';
+import { getRandomInteger, getRandomArrayElement, getRandomBoolean, getRandomKey, formalizeTime } from '../utils/common.js';
 import dayjs from 'dayjs';
 import dayjsRandom from 'dayjs-random';
 import dayOfYear from 'dayjs/plugin/dayOfYear';

@@ -3,7 +3,7 @@ import ListView from '../view/list-view.js';
 import EventEditView from '../view/event-edit-view.js';
 import ListItemView from '../view/list-item-view.js';
 import { render, replace } from '../framework/render.js';
-import { sortByDate } from '../utils.js';
+import { sortByDate } from '../utils/common.js';
 import EmptyListView from '../view/empty-list-view.js';
 import EventLineView from '../view/event-line-view.js';
 

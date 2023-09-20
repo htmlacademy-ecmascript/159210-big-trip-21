@@ -1,6 +1,6 @@
 import { DESTINATIONS, EDIT_DATE_FORMAT, EVENT_TYPES } from '../const.js';
-import { createElement } from '../render.js';
 import dayjs from 'dayjs';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createEventTypeItems () {
   let itemsList = '';
@@ -67,30 +67,50 @@ function createEventHeaderTemplate({ eventType, price, destination, startTime, e
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Cancel</button>
+      <button class="event__rollup-btn" type="button">
+                    <span class="visually-hidden">Open event</span>
+                  </button>
     </header>`
   );
 }
 
-class EventHeaderView {
-  constructor(event) {
-    this.event = event;
+export default class EventHeaderView extends AbstractView {
+  #event = null;
+  #onSubmitClick = null;
+  #onCancelClick = null;
+  #onRollupClick = null;
+
+  constructor({ event, onSubmitClick, onCancelClick, onRollupClick }) {
+    super();
+    this.#event = event;
+    this.#onSubmitClick = onSubmitClick;
+    this.#onCancelClick = onCancelClick;
+    this.#onRollupClick = onRollupClick;
+
+    this.element.querySelector('.event__save-btn')
+      .addEventListener('click', this.#submitClickHandler);
+    this.element.querySelector('.event__reset-btn')
+      .addEventListener('click', this.#cancelClickHandler);
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#rollupClickHandler);
   }
 
-  getTemplate() {
-    return createEventHeaderTemplate(this.event);
+  get template() {
+    return createEventHeaderTemplate(this.#event);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
+  #submitClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onSubmitClick();
+  };
 
-    return this.element;
-  }
+  #cancelClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onCancelClick();
+  };
 
-  deleteElement() {
-    this.element.remove();
-  }
+  #rollupClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onRollupClick();
+  };
 }
-
-export { EventHeaderView };

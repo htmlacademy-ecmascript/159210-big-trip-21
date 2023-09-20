@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { OFFERS, OFFERS_PRICES, DATE_FORMAT, MAX_TIME } from '../const.js';
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 let isDeacreaseNeeded = false;
 
@@ -78,26 +78,25 @@ function createEventTemplate({ date, eventType, destination, startTime, price, o
   );
 }
 
-class EventLineView {
-  constructor (entry) {
-    this.entry = entry;
+export default class EventLineView extends AbstractView {
+  #event = null;
+  #onEditClick = null;
+
+  constructor ({ event, onEditClick}) {
+    super();
+    this.#event = event;
+    this.#onEditClick = onEditClick;
+
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#editClickHandler);
   }
 
-  getTemplate() {
-    return createEventTemplate(this.entry);
+  get template() {
+    return createEventTemplate(this.#event);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  deleteElement() {
-    this.element.remove();
-  }
+  #editClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onEditClick();
+  };
 }
-
-export { EventLineView };

@@ -1,5 +1,5 @@
 import { OFFERS, OFFERS_PRICES } from '../const.js';
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 function createOffersList({offers}) {
   let offersList = '';
@@ -28,26 +28,16 @@ function createOfferTemplate(event) {
   );
 }
 
-class EventOfferView {
+export default class EventOfferView extends AbstractView {
+  #event = null;
+
   constructor (event) {
-    this.event = event;
+    super();
+    this.#event = event;
   }
 
-  getTemplate() {
-    return createOfferTemplate(this.event);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  deleteElement() {
-    this.element.remove();
+  get template() {
+    return createOfferTemplate(this.#event);
   }
 }
 
-export { EventOfferView };

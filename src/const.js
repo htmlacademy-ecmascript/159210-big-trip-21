@@ -65,6 +65,13 @@ const SORT_EVENTS = {
 
 const DEFAULT_FILTER = 'Everything';
 
+const FilterType = {
+  EVERYTHING: 'Everything',
+  FUTURE: 'Future',
+  PRESENT: 'Present',
+  PAST: 'Past'
+};
+
 export {
   ENTRY_COUNT,
   MAX_TIME,
@@ -81,5 +88,6 @@ export {
   DESTINATIONS,
   PHOTOS_COUNT,
   PHOTOS_BORDER_NUMS,
-  PHOTOS_SRC
+  PHOTOS_SRC,
+  FilterType
 };

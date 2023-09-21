@@ -1,15 +1,15 @@
 import dayjs from 'dayjs';
 
-function isEventInFuture(date) {
+function isDateInFuture(date) {
   return date && dayjs().isBefore(dayjs(date), 'D');
 }
 
-function isEventToday(date) {
+function isDateToday(date) {
   return date && dayjs().isSame(dayjs(date), 'D');
 }
 
-function isEventInPast(date) {
+function isDateInPast(date) {
   return date && dayjs().isAfter(dayjs(date), 'D');
 }
 
-export { isEventInFuture, isEventToday, isEventInPast };
+export { isDateInFuture, isDateToday, isDateInPast };

@@ -44,7 +44,7 @@ export default class PagePresenter {
 
   #renderEvent(event) {
     const eventPresenter = new EventPresenter({
-      eventListContainer: this.#listComponent.element
+      eventListComponent: this.#listComponent.element
     });
     eventPresenter.init(event);
   }

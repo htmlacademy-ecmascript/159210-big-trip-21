@@ -12,28 +12,35 @@ export default class PagePresenter {
   #sortComponent = null;
   #listComponent = null;
   #eventsModel = null;
+  #emptyEventList = null;
 
   constructor ({container, eventsModel}) {
     this.#container = container;
     this.#sortComponent = new SortView();
     this.#listComponent = new ListView();
     this.#eventsModel = eventsModel;
+    this.#emptyEventList = new EmptyListView();
   }
 
   init() {
 
     this.events = [...this.#eventsModel.getEvents()];
 
-    if (this.events.length > 0) {
-      this.events = sortByDate(this.events);
-      render(this.#sortComponent, this.#container);
-      render(this.#listComponent, this.#container);
+    this.#renderSort();
 
-      for (let i = 0; i < this.events.length; i++) {
-        this.#renderEvent(this.events[i]);
-      }
+    if (this.events.length > 0) {
+      this.#renderEventList();
     } else {
-      render(new EmptyListView, this.#container);
+      this.#renderEmptyEventList();
+    }
+  }
+
+  #renderEventList () {
+    this.events = sortByDate(this.events);
+    render(this.#listComponent, this.#container);
+
+    for (let i = 0; i < this.events.length; i++) {
+      this.#renderEvent(this.events[i]);
     }
   }
 
@@ -83,5 +90,13 @@ export default class PagePresenter {
 
     render(eventContainerComponent, this.#listComponent.element);
     render(eventComponent, eventContainerComponent.element);
+  }
+
+  #renderSort () {
+    render(this.#sortComponent, this.#container);
+  }
+
+  #renderEmptyEventList () {
+    render(this.#emptyEventList, this.#container);
   }
 }

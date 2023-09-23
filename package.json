@@ -28,6 +28,7 @@
   "dependencies": {
     "day-of-year": "0.1.0",
     "dayjs": "1.11.7",
-    "dayjs-random": "1.0.1"
+    "dayjs-random": "1.0.1",
+    "nanoid": "4.0.2"
   }
 }

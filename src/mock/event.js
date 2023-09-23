@@ -3,6 +3,7 @@ import { getRandomInteger, getRandomArrayElement, getRandomBoolean, getRandomKey
 import dayjs from 'dayjs';
 import dayjsRandom from 'dayjs-random';
 import dayOfYear from 'dayjs/plugin/dayOfYear';
+import { nanoid } from 'nanoid';
 
 dayjs.extend(dayjsRandom);
 dayjs.extend(dayOfYear);
@@ -38,9 +39,10 @@ function getRandomOffers() {
   return offersList;
 }
 
-function getNewEntry() {
+function getNewEvent() {
   const newDate = getDateTime();
   return {
+    id: nanoid(),
     date: newDate.date,
     eventType: getRandomArrayElement(EVENT_TYPES),
     destination: getRandomKey(DESTINATIONS),
@@ -52,4 +54,4 @@ function getNewEntry() {
   };
 }
 
-export { getNewEntry };
+export { getNewEvent };

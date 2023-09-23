@@ -4,29 +4,30 @@ import { render } from '../framework/render.js';
 import { sortByDate } from '../utils/common.js';
 import EmptyListView from '../view/empty-list-view.js';
 import EventPresenter from './event-presenter.js';
+import { updateEvent } from '../utils/event.js';
 
 export default class PagePresenter {
   #container = null;
-  #sortComponent = null;
-  #listComponent = null;
   #eventsModel = null;
-  #emptyEventList = null;
+
+  #events = [];
+  #sortComponent = new SortView();
+  #listComponent = new ListView();
+  #emptyEventList = new EmptyListView();
+  #eventPresenters = new Map();
 
   constructor({ container, eventsModel }) {
     this.#container = container;
-    this.#sortComponent = new SortView();
-    this.#listComponent = new ListView();
     this.#eventsModel = eventsModel;
-    this.#emptyEventList = new EmptyListView();
   }
 
   init() {
 
-    this.events = [...this.#eventsModel.getEvents()];
+    this.#events = [...this.#eventsModel.getEvents()];
 
     this.#renderSort();
 
-    if (this.events.length > 0) {
+    if (this.#events.length > 0) {
       this.#renderEventList();
     } else {
       this.#renderEmptyEventList();
@@ -34,19 +35,21 @@ export default class PagePresenter {
   }
 
   #renderEventList() {
-    this.events = sortByDate(this.events);
+    this.#events = sortByDate(this.#events);
     render(this.#listComponent, this.#container);
 
-    for (let i = 0; i < this.events.length; i++) {
-      this.#renderEvent(this.events[i]);
+    for (let i = 0; i < this.#events.length; i++) {
+      this.#renderEvent(this.#events[i]);
     }
   }
 
   #renderEvent(event) {
     const eventPresenter = new EventPresenter({
-      eventListComponent: this.#listComponent.element
+      eventListComponent: this.#listComponent.element,
+      onEventChange: this.#onEventChange
     });
     eventPresenter.init(event);
+    this.#eventPresenters.set(event.id, eventPresenter);
   }
 
   #renderSort() {
@@ -56,4 +59,9 @@ export default class PagePresenter {
   #renderEmptyEventList() {
     render(this.#emptyEventList, this.#container);
   }
+
+  #onEventChange = (updatedEvent) => {
+    this.#events = updateEvent(this.#events, updatedEvent);
+    this.#eventPresenters.get(updatedEvent.id).init(updatedEvent);
+  };
 }

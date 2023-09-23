@@ -9,22 +9,24 @@ export default class EventPresenter {
   #eventComponent = null;
   #eventEditComponent = null;
   #event = null;
-  #eventContainerComponent = null;
+  #onEventChange = null;
 
-  constructor({ eventListComponent }) {
+  #eventContainerComponent = new ListItemView();
+
+  constructor({ eventListComponent, onEventChange }) {
     this.#eventListComponent = eventListComponent;
+    this.#onEventChange = onEventChange;
   }
 
   init(event) {
-    const prevEventContainerComponent = this.#eventContainerComponent;
     const prevEventComponent = this.#eventComponent;
     const prevEventEditComponent = this.#eventEditComponent;
 
     this.#event = event;
-    this.#eventContainerComponent = new ListItemView();
     this.#eventComponent = new EventLineView({
       event: this.#event,
-      onEditClick: this.#onEditClick
+      onEditClick: this.#onEditClick,
+      onFavoriteClick: this.#onFavoriteClick
     });
     this.#eventEditComponent = new EventEditView({
       event: this.#event,
@@ -34,31 +36,24 @@ export default class EventPresenter {
     });
 
     this.#eventEditComponent.init();
-
     if (prevEventComponent === null
-      || prevEventEditComponent === null
-      || prevEventContainerComponent === null) {
+      || prevEventEditComponent === null) {
 
       render(this.#eventContainerComponent, this.#eventListComponent);
       render(this.#eventComponent, this.#eventContainerComponent.element);
       return;
     }
 
-    if (this.#eventContainerComponent.contains(prevEventComponent.element)) {
+    if (this.#eventContainerComponent.element.contains(prevEventComponent.element)) {
       replace(this.#eventComponent, prevEventComponent);
     }
 
-    if (this.#eventContainerComponent.contains(prevEventEditComponent.element)) {
+    if (this.#eventContainerComponent.element.contains(prevEventEditComponent.element)) {
       replace(this.#eventEditComponent, prevEventEditComponent);
     }
 
-    if (this.#eventListComponent.contains(prevEventContainerComponent.element)) {
-      replace(this.#eventContainerComponent, prevEventContainerComponent);
-    }
-
-    remove(prevEventContainerComponent);
     remove(prevEventComponent);
-    remove(prevEventContainerComponent);
+    remove(prevEventEditComponent);
   }
 
   destroy () {
@@ -88,6 +83,10 @@ export default class EventPresenter {
 
   #onRollupClick = () => {
     this.#replaceFormToLine();
+  };
+
+  #onFavoriteClick = () => {
+    this.#onEventChange({ ...this.#event, isFav: !this.#event.isFav });
   };
 
   #replaceLineToForm() {

@@ -12,4 +12,8 @@ function isDateInPast(date) {
   return date && dayjs().isAfter(dayjs(date), 'D');
 }
 
-export { isDateInFuture, isDateToday, isDateInPast };
+function updateEvent(events, update) {
+  return events.map((event) => event.id === update.id ? update : event);
+}
+
+export { isDateInFuture, isDateToday, isDateInPast, updateEvent };

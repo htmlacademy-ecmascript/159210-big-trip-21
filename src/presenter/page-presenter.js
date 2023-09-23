@@ -23,7 +23,7 @@ export default class PagePresenter {
 
   init() {
 
-    this.#events = [...this.#eventsModel.getEvents()];
+    this.#events = [...this.#eventsModel.events];
 
     this.#renderSort();
 

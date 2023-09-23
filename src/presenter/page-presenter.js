@@ -46,7 +46,8 @@ export default class PagePresenter {
   #renderEvent(event) {
     const eventPresenter = new EventPresenter({
       eventListComponent: this.#listComponent.element,
-      onEventChange: this.#onEventChange
+      onEventChange: this.#onEventChange,
+      onModeChange: this.#onModeChange
     });
     eventPresenter.init(event);
     this.#eventPresenters.set(event.id, eventPresenter);
@@ -63,5 +64,9 @@ export default class PagePresenter {
   #onEventChange = (updatedEvent) => {
     this.#events = updateEvent(this.#events, updatedEvent);
     this.#eventPresenters.get(updatedEvent.id).init(updatedEvent);
+  };
+
+  #onModeChange = () => {
+    this.#eventPresenters.forEach((presenter) => presenter.resetView());
   };
 }

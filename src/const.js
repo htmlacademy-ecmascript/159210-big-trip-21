@@ -72,6 +72,11 @@ const FilterType = {
   PAST: 'Past'
 };
 
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  EDITING: 'EDITING',
+};
+
 export {
   ENTRY_COUNT,
   MAX_TIME,
@@ -89,5 +94,6 @@ export {
   PHOTOS_COUNT,
   PHOTOS_BORDER_NUMS,
   PHOTOS_SRC,
-  FilterType
+  FilterType,
+  Mode
 };

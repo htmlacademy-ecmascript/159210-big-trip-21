@@ -2,6 +2,7 @@ import { remove, render, replace } from '../framework/render.js';
 import EventEditView from '../view/event-edit-view.js';
 import EventLineView from '../view/event-line-view.js';
 import ListItemView from '../view/list-item-view.js';
+import { Mode } from '../const.js';
 
 
 export default class EventPresenter {
@@ -10,12 +11,15 @@ export default class EventPresenter {
   #eventEditComponent = null;
   #event = null;
   #onEventChange = null;
+  #onModeChange = null;
 
   #eventContainerComponent = new ListItemView();
+  #mode = Mode.DEFAULT;
 
-  constructor({ eventListComponent, onEventChange }) {
+  constructor({ eventListComponent, onEventChange, onModeChange }) {
     this.#eventListComponent = eventListComponent;
     this.#onEventChange = onEventChange;
+    this.#onModeChange = onModeChange;
   }
 
   init(event) {
@@ -44,11 +48,11 @@ export default class EventPresenter {
       return;
     }
 
-    if (this.#eventContainerComponent.element.contains(prevEventComponent.element)) {
+    if (this.#mode === Mode.DEFAULT) {
       replace(this.#eventComponent, prevEventComponent);
     }
 
-    if (this.#eventContainerComponent.element.contains(prevEventEditComponent.element)) {
+    if (this.#mode === Mode.EDITING) {
       replace(this.#eventEditComponent, prevEventEditComponent);
     }
 
@@ -62,6 +66,12 @@ export default class EventPresenter {
     remove(this.#eventEditComponent);
   }
 
+  resetView () {
+    if (this.#mode !== Mode.DEFAULT) {
+      this.#replaceFormToLine();
+    }
+  }
+
   #escKeyDownHandler(evt) {
     if (evt.key === 'Escape') {
       evt.preventDefault();
@@ -73,7 +83,8 @@ export default class EventPresenter {
     this.#replaceLineToForm();
   };
 
-  #onSubmitClick = () => {
+  #onSubmitClick = (event) => {
+    this.#onEventChange(event);
     this.#replaceFormToLine();
   };
 
@@ -92,10 +103,13 @@ export default class EventPresenter {
   #replaceLineToForm() {
     replace(this.#eventEditComponent, this.#eventComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#onModeChange();
+    this.#mode = Mode.EDITING;
   }
 
   #replaceFormToLine() {
     replace(this.#eventComponent, this.#eventEditComponent);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#mode = Mode.DEFAULT;
   }
 }

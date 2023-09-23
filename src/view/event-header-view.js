@@ -76,21 +76,13 @@ function createEventHeaderTemplate({ eventType, price, destination, startTime, e
 
 export default class EventHeaderView extends AbstractView {
   #event = null;
-  #onSubmitClick = null;
-  #onCancelClick = null;
   #onRollupClick = null;
 
-  constructor({ event, onSubmitClick, onCancelClick, onRollupClick }) {
+  constructor({ event, onRollupClick }) {
     super();
     this.#event = event;
-    this.#onSubmitClick = onSubmitClick;
-    this.#onCancelClick = onCancelClick;
     this.#onRollupClick = onRollupClick;
 
-    this.element.querySelector('.event__save-btn')
-      .addEventListener('click', this.#submitClickHandler);
-    this.element.querySelector('.event__reset-btn')
-      .addEventListener('click', this.#cancelClickHandler);
     this.element.querySelector('.event__rollup-btn')
       .addEventListener('click', this.#rollupClickHandler);
   }
@@ -98,16 +90,6 @@ export default class EventHeaderView extends AbstractView {
   get template() {
     return createEventHeaderTemplate(this.#event);
   }
-
-  #submitClickHandler = (evt) => {
-    evt.preventDefault();
-    this.#onSubmitClick();
-  };
-
-  #cancelClickHandler = (evt) => {
-    evt.preventDefault();
-    this.#onCancelClick();
-  };
 
   #rollupClickHandler = (evt) => {
     evt.preventDefault();

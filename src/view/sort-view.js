@@ -1,8 +1,17 @@
 import { SortType } from '../const.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createSortItem(name, isEnabled, isChecked) {
-  return (`<div class="trip-sort__item  trip-sort__item--${name}">
+function createSortTemplate() {
+  const sortItems = Object.entries(SortType).map(
+    ([, {name, isEnabled, isChecked}]) => ({
+      name: name,
+      isEnabled: isEnabled,
+      isChecked: isChecked
+    }),
+  );
+
+  const sortItemsTemplate = sortItems.map(({ name, isEnabled, isChecked }) =>
+    (`<div class="trip-sort__item  trip-sort__item--${name}">
         <input
           id="sort-${name}"
           class="trip-sort__input  visually-hidden"
@@ -15,20 +24,7 @@ function createSortItem(name, isEnabled, isChecked) {
           class="trip-sort__btn"
           for="sort-${name}"
           data-sort-type="${name}">${name}</label>
-      </div>`);
-}
-
-function createSortTemplate() {
-  const sortItems = Object.entries(SortType).map(
-    ([, {name, isEnabled, isChecked}]) => ({
-      name: name,
-      isEnabled: isEnabled,
-      isChecked: isChecked
-    }),
-  );
-
-  const sortItemsTemplate = sortItems.map(({ name, isEnabled, isChecked }) =>
-    createSortItem(name, isEnabled, isChecked)).join('');
+      </div>`)).join('');
 
   return(
     `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
@@ -52,7 +48,8 @@ export default class SortView extends AbstractView {
   }
 
   #sortTypeChangeHandler = (evt) => {
-    if (evt.target.tagName !== 'LABEL') {
+    if (evt.target.tagName !== 'LABEL'
+      || evt.target.parentNode.querySelector('input').disabled === true) {
       return;
     }
     evt.preventDefault();

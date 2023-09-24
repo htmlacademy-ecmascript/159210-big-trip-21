@@ -67,10 +67,12 @@ export default class PagePresenter {
   }
 
   #getCurrentSortType(types) {
-    for (const { name, isChecked } of Object.entries(types).map(([, type]) => ({
+    const sortTypes = Object.entries(types).map(([, type]) => ({
       name: type.name,
       isChecked: type.isChecked
-    }))) {
+    }));
+
+    for (const { name, isChecked } of sortTypes) {
       if (isChecked) {
         return name;
       }

@@ -14,16 +14,25 @@ function createPointEditTemplate() {
 
 export default class EventEditView extends AbstractView {
   #header = null;
-  #details = null;
   #offer = null;
   #destination = null;
+  #onSubmitClick = null;
+  #onCancelClick = null;
+  #event = null;
+
+  #details = new EventDetailsView();
 
   constructor({ event, onSubmitClick, onCancelClick, onRollupClick }) {
     super();
-    this.#header = new EventHeaderView({ event, onSubmitClick, onCancelClick, onRollupClick });
-    this.#details = new EventDetailsView();
+    this.#header = new EventHeaderView({ event, onRollupClick });
     this.#offer = new EventOfferView(event);
     this.#destination = new EventDestinationView(event);
+    this.#onSubmitClick = onSubmitClick;
+    this.#onCancelClick = onCancelClick;
+    this.#event = event;
+
+    this.element.addEventListener('submit', this.#submitClickHandler);
+    this.element.addEventListener('reset', this.#cancelClickHandler);
   }
 
   get template() {
@@ -36,4 +45,14 @@ export default class EventEditView extends AbstractView {
     render(this.#offer, this.#details.element);
     render(this.#destination, this.#details.element);
   }
+
+  #submitClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onSubmitClick(this.#event);
+  };
+
+  #cancelClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onCancelClick();
+  };
 }

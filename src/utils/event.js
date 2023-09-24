@@ -9,7 +9,7 @@ function calculateTime(firstTime, secondTime, maxTime) {
   const basicCalc = firstTime - secondTime;
   if (firstTime - secondTime < 0) {
     isDeacreaseNeeded = true;
-    calculatedTime = calculatedTime === 0 ? basicCalc : maxTime + basicCalc;
+    calculatedTime = maxTime + basicCalc;
   } else {
     isDeacreaseNeeded = false;
     calculatedTime = basicCalc;
@@ -45,13 +45,7 @@ function updateEvent(events, update) {
 }
 
 function compareNumbers(dataA, dataB) {
-  if (dataA < dataB) {
-    return -1;
-  }
-  if (dataA > dataB) {
-    return 1;
-  }
-  return 0;
+  return dataA - dataB;
 }
 
 const sortByDate = (arrayOfObjects) =>

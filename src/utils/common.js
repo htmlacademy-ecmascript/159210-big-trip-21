@@ -13,25 +13,10 @@ const getRandomBoolean = () => Math.random() < 0.5;
 
 const getRandomKey = (obj) => Object.keys(obj)[getRandomInteger(0, Object.keys(obj).length - 1)];
 
-const sortByDate = (arrayOfObjects) => {
-  const newArray = arrayOfObjects.sort((a, b) => {
-    if (Date.parse(a.date) < Date.parse(b.date)) {
-      return -1;
-    }
-    if (Date.parse(a.date) > Date.parse(b.date)) {
-      return 1;
-    }
-    return 0;
-  });
-
-  return newArray;
-};
-
 export {
   getRandomInteger,
   formalizeTime,
   getRandomArrayElement,
   getRandomBoolean,
-  getRandomKey,
-  sortByDate
+  getRandomKey
 };

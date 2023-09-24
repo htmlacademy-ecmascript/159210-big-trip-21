@@ -10,9 +10,11 @@ function createSortItem(name, isEnabled, isChecked) {
           name="trip-sort"
           value="sort-${name}"
           ${isEnabled ? '' : 'disabled'}
-          ${isChecked ? 'checked' : ''}
-          data-sort-type="${name}">
-        <label class="trip-sort__btn" for="sort-${name}">${name}</label>
+          ${isChecked ? 'checked' : ''}>
+        <label
+          class="trip-sort__btn"
+          for="sort-${name}"
+          data-sort-type="${name}">${name}</label>
       </div>`);
 }
 
@@ -36,7 +38,25 @@ function createSortTemplate() {
 }
 
 export default class SortView extends AbstractView {
+  #onSortTypeChange = null;
+
+  constructor({ onSortTypeChange }) {
+    super();
+    this.#onSortTypeChange = onSortTypeChange;
+
+    this.element.addEventListener('click', this.#sortTypeChangeHandler);
+  }
+
   get template() {
     return createSortTemplate();
   }
+
+  #sortTypeChangeHandler = (evt) => {
+    if (evt.target.tagName !== 'LABEL') {
+      return;
+    }
+    evt.preventDefault();
+    evt.target.parentNode.querySelector('input').checked = true;
+    this.#onSortTypeChange(evt.target.dataset.sortType);
+  };
 }

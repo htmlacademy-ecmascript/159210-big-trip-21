@@ -1,31 +1,18 @@
 import dayjs from 'dayjs';
 import { MAX_TIME } from '../const.js';
 
-let isDeacreaseNeeded = false;
-
-function calculateTime(firstTime, secondTime, maxTime) {
-  let calculatedTime;
-  const addNumber = isDeacreaseNeeded ? -1 : 0;
-  const basicCalc = firstTime - secondTime;
-  if (firstTime - secondTime < 0) {
-    isDeacreaseNeeded = true;
-    calculatedTime = maxTime + basicCalc;
-  } else {
-    isDeacreaseNeeded = false;
-    calculatedTime = basicCalc;
-  }
-
-  return calculatedTime + addNumber;
-}
-
 function getEventDuration(startTime, endTime) {
-  const minutes = calculateTime(dayjs(endTime).get('minute'), dayjs(startTime).get('minute'), MAX_TIME.MINUTES);
-  const hours = calculateTime(dayjs(endTime).get('hour'), dayjs(startTime).get('hour'), MAX_TIME.HOURS);
-  const days = calculateTime(dayjs(endTime).get('date'), dayjs(startTime).get('date'), MAX_TIME.DAYS);
-  const month = isDeacreaseNeeded ? (dayjs(endTime).get('month') + 1) - (dayjs(startTime).get('month') + 1) - 1 :
-    (dayjs(endTime).get('month') + 1) - (dayjs(startTime).get('month') + 1);
+  let fullTime = -dayjs(Date.parse(startTime)).diff(Date.parse(endTime), 'minute');
 
-  return `${month * MAX_TIME.DAYS + days}D ${hours}H ${minutes}M`;
+  const minutes = fullTime % MAX_TIME.MINUTES;
+  fullTime = (fullTime - minutes) / MAX_TIME.MINUTES;
+
+  const hours = fullTime % MAX_TIME.HOURS;
+  fullTime = (fullTime - hours) / MAX_TIME.HOURS;
+
+  const days = fullTime;
+
+  return `${days}D ${hours}H ${minutes}M`;
 }
 
 function isDateInFuture(date) {

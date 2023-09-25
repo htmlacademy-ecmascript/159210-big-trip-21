@@ -77,6 +77,34 @@ const Mode = {
   EDITING: 'EDITING',
 };
 
+const SortType = {
+  DAY: {
+    name: 'day',
+    isEnabled: true,
+    isChecked: false
+  },
+  EVENT: {
+    name: 'event',
+    isEnabled: false,
+    isChecked: false
+  },
+  TIME: {
+    name: 'time',
+    isEnabled: true,
+    isChecked: false
+  },
+  PRICE: {
+    name: 'price',
+    isEnabled: true,
+    isChecked: true
+  },
+  OFFERS: {
+    name: 'offers',
+    isEnabled: false,
+    isChecked: false
+  }
+};
+
 export {
   ENTRY_COUNT,
   MAX_TIME,
@@ -95,5 +123,6 @@ export {
   PHOTOS_BORDER_NUMS,
   PHOTOS_SRC,
   FilterType,
-  Mode
+  Mode,
+  SortType
 };

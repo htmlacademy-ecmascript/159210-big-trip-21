@@ -1,6 +1,6 @@
 import { DESTINATIONS, EDIT_DATE_FORMAT, EVENT_TYPES } from '../const.js';
 import dayjs from 'dayjs';
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 
 function createEventTypeItems () {
   let itemsList = '';
@@ -74,25 +74,70 @@ function createEventHeaderTemplate({ eventType, price, destination, startTime, e
   );
 }
 
-export default class EventHeaderView extends AbstractView {
-  #event = null;
+export default class EventHeaderView extends AbstractStatefulView {
   #onRollupClick = null;
 
   constructor({ event, onRollupClick }) {
     super();
-    this.#event = event;
+    this._setState(EventHeaderView.parseHeaderToState(event));
     this.#onRollupClick = onRollupClick;
 
-    this.element.querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#rollupClickHandler);
+    this._restoreHandlers();
   }
 
   get template() {
-    return createEventHeaderTemplate(this.#event);
+    return createEventHeaderTemplate(this._state);
+  }
+
+  _restoreHandlers() {
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#rollupClickHandler);
+    this.element.querySelector('.event__type-list')
+      .addEventListener('click', this.#eventTypeListHandler);
+    this.element.querySelector('.event__input--destination')
+      .addEventListener('input', this.#destinationChangeHandler);
+    this.element.querySelector('.event__input--price')
+      .addEventListener('blur', this.#priceChangeHandler);
   }
 
   #rollupClickHandler = (evt) => {
     evt.preventDefault();
     this.#onRollupClick();
   };
+
+  #eventTypeListHandler = (evt) => {
+    if (!evt.target.closest('.event__type-item')) {
+      return;
+    }
+    evt.preventDefault();
+    this.updateElement({
+      eventType: evt.target.closest('label').innerText
+    });
+  };
+
+  #destinationChangeHandler = (evt) => {
+    if(Object.keys(DESTINATIONS).includes(evt.target.value)) {
+      this.updateElement({
+        destination: evt.target.value
+      });
+    }
+  };
+
+  #priceChangeHandler = (evt) => {
+    this.updateElement({
+      price: evt.target.value
+    });
+  };
+
+  static parseHeaderToState(event) {
+    return {
+      ...event
+    };
+  }
+
+  static parseStateToHeader(state) {
+    const event = { ...state };
+
+    return event;
+  }
 }

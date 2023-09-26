@@ -80,8 +80,7 @@ export default class EventEditView extends AbstractStatefulView {
     this.#onSubmitClick = onSubmitClick;
     this.#onCancelClick = onCancelClick;
 
-    this.element.addEventListener('submit', this.#submitClickHandler);
-    this.element.addEventListener('reset', this.#cancelClickHandler);
+    this._restoreHandlers();
   }
 
   get template() {
@@ -90,6 +89,15 @@ export default class EventEditView extends AbstractStatefulView {
       this._state.isOffers,
       this._state.isDestination
     );
+  }
+
+  _restoreHandlers() {
+    this.element.addEventListener('submit', this.#submitClickHandler);
+    this.element.addEventListener('reset', this.#cancelClickHandler);
+    this.#header.element.querySelector('.event__input--destination')
+      .addEventListener('input', this.#destinationChangeHandler);
+
+    this.init();
   }
 
   init() {
@@ -104,6 +112,14 @@ export default class EventEditView extends AbstractStatefulView {
   #cancelClickHandler = (evt) => {
     evt.preventDefault();
     this.#onCancelClick();
+  };
+
+  #destinationChangeHandler = (evt) => {
+    if (Object.keys(DESTINATIONS).includes(evt.target.value)) {
+      this.updateElement({
+        destination: evt.target.value
+      });
+    }
   };
 
   static parseEventToState(event) {

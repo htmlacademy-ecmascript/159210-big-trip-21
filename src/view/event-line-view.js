@@ -16,14 +16,14 @@ function createOffersList(offers) {
   return offersList;
 }
 
-function createEventTemplate({ date, eventType, destination, startTime, price, offers, isFav, endTime}) {
+function createEventTemplate({ date, typeAndOffers, destination, startTime, price, isFav, endTime}) {
   return (
     `<div class="event">
       <time class="event__date" datetime="2019-03-18">${dayjs(date).format(DATE_FORMAT)}</time>
       <div class="event__type">
-        <img class="event__type-icon" width="42" height="42" src="img/icons/${eventType.toLowerCase()}.png" alt="Event type icon">
+        <img class="event__type-icon" width="42" height="42" src="img/icons/${typeAndOffers.type.toLowerCase()}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${eventType} ${destination}</h3>
+      <h3 class="event__title">${typeAndOffers.type} ${destination}</h3>
       <div class="event__schedule">
         <p class="event__time">
           <time class="event__start-time" datetime="2019-03-18T10:30">${dayjs(startTime).format('HH:mm')}</time>
@@ -37,7 +37,7 @@ function createEventTemplate({ date, eventType, destination, startTime, price, o
       </p>
       <h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
-        ${createOffersList(offers)}
+        ${createOffersList(typeAndOffers.offers)}
       </ul>
       <button class="event__favorite-btn ${isFav ? 'event__favorite-btn--active' : ''}" type="button">
         <span class="visually-hidden">Add to favorite</span>

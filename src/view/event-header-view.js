@@ -6,8 +6,15 @@ function createEventTypeItems () {
   let itemsList = '';
   EVENT_TYPES.forEach((eventType) => {
     itemsList += `<div class="event__type-item">
-              <input id="event-type-${eventType.toLowerCase()}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType.toLowerCase()}">
-              <label class="event__type-label  event__type-label--${eventType.toLowerCase()}" for="event-type-${eventType.toLowerCase()}-1">${eventType}</label>
+              <input
+                id="event-type-${eventType.type.toLowerCase()}-1"
+                class="event__type-input  visually-hidden"
+                type="radio"
+                name="event-type"
+                value="${eventType.type.toLowerCase()}">
+              <label
+                class="event__type-label  event__type-label--${eventType.type.toLowerCase()}"
+                for="event-type-${eventType.type.toLowerCase()}-1">${eventType.type}</label>
             </div>`;
   });
   return itemsList;
@@ -21,13 +28,13 @@ function createDestinationOptions() {
   return optionsList;
 }
 
-function createEventHeaderTemplate({ eventType, price, destination, startTime, endTime }) {
+function createEventHeaderTemplate({ typeAndOffers, price, destination, startTime, endTime }) {
   return (
     `<header class="event__header">
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="img/icons/${eventType.toLowerCase()}.png" alt="Event type icon">
+          <img class="event__type-icon" width="17" height="17" src="img/icons/${typeAndOffers.type.toLowerCase()}.png" alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -41,7 +48,7 @@ function createEventHeaderTemplate({ eventType, price, destination, startTime, e
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          ${eventType}
+          ${typeAndOffers.type}
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
         <datalist id="destination-list-1">

@@ -23,15 +23,34 @@ const PHOTOS_COUNT = {
 };
 
 const EVENT_TYPES = [
-  'Taxi',
-  'Bus',
-  'Train',
-  'Ship',
-  'Drive',
-  'Flight',
-  'Check-in',
-  'Sightseeing',
-  'Restaurant'
+  {
+    type: 'Taxi',
+    offers: ['luggage', 'comfort']
+  }, {
+    type: 'Bus',
+    offers: ['luggage', 'comfort', 'seats', 'meal']
+  }, {
+    type: 'Train',
+    offers: ['luggage', 'comfort', 'seats', 'meal']
+  }, {
+    type: 'Ship',
+    offers: ['luggage', 'comfort', 'meal']
+  }, {
+    type: 'Drive',
+    offers: ['luggage', 'comfort']
+  }, {
+    type: 'Flight',
+    offers: ['luggage', 'comfort', 'seats', 'meal']
+  }, {
+    type: 'Check-in',
+    offers: ['luggage', 'comfort', 'meal']
+  }, {
+    type: 'Sightseeing',
+    offers: ['comfort', 'seats', 'train']
+  }, {
+    type: 'Restaurant',
+    offers: ['seats']
+  }
 ];
 
 const DESTINATIONS = {

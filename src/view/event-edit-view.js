@@ -1,22 +1,36 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { OFFERS, OFFERS_PRICES, DESTINATIONS,
-  PHOTOS_BORDER_NUMS, PHOTOS_COUNT, PHOTOS_SRC } from '../const.js';
+  PHOTOS_BORDER_NUMS, PHOTOS_COUNT, PHOTOS_SRC, EVENT_TYPES } from '../const.js';
 import { getRandomInteger } from '../utils/common.js';
 import EventHeaderView from './event-header-view.js';
 import { RenderPosition, render } from '../framework/render.js';
 
-function createOffersList({ offers }) {
+function createOffersList(event) {
+  //['luggage', 'comfort', 'seats', 'meal']
+  // {
+  //   type: 'Taxi',
+  //     offers: ['luggage', 'comfort']
+  // }
+  const eventType = event.typeAndOffers.type;
+  const eventOffers = event.typeAndOffers.offers;
+  const offersofType = EVENT_TYPES.filter((item) =>
+    item.type === eventType)[0].offers;
   let offersList = '';
-  for (const [key, value] of Object.entries(OFFERS)) {
+  offersofType.forEach((offer) => {
     offersList += `<div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${key}-1" type="checkbox" name="event-offer-${key}" ${offers.includes(String(key)) ? 'checked' : ''}>
-          <label class="event__offer-label" for="event-offer-${key}-1">
-            <span class="event__offer-title">${value}</span>
+          <input
+            class="event__offer-checkbox  visually-hidden"
+            id="event-offer-${offer}-1"
+            type="checkbox"
+            name="event-offer-${offer}"
+            ${eventOffers.includes(offer) ? 'checked' : ''}>
+          <label class="event__offer-label" for="event-offer-${offer}-1">
+            <span class="event__offer-title">${OFFERS[offer]}</span>
             &plus;&euro;&nbsp;
-            <span class="event__offer-price">${OFFERS_PRICES[key]}</span>
+            <span class="event__offer-price">${OFFERS_PRICES[offer]}</span>
           </label>
         </div>`;
-  }
+  });
   return offersList;
 }
 
@@ -126,7 +140,7 @@ export default class EventEditView extends AbstractStatefulView {
     return {
       ...event,
       isDestination: event.destination !== null,
-      isOffers: event.offers.length > 0
+      isOffers: event.typeAndOffers.offers.length > 0
     };
   }
 

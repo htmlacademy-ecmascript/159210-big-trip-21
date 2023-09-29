@@ -174,10 +174,12 @@ export default class EventEditView extends AbstractStatefulView {
   };
 
   static parseEventToState(event) {
+    const type = event.typeAndOffers.type;
     return {
       ...event,
       isDestination: event.destination !== null,
-      isOffers: event.typeAndOffers.offers.length > 0
+      isOffers: EVENT_TYPES.filter((item) =>
+        item.type === type)[0].offers.length > 0
     };
   }
 

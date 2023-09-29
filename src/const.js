@@ -37,7 +37,7 @@ const EVENT_TYPES = [
     offers: ['luggage', 'comfort', 'meal']
   }, {
     type: 'Drive',
-    offers: ['luggage', 'comfort']
+    offers: ['comfort']
   }, {
     type: 'Flight',
     offers: ['luggage', 'comfort', 'seats', 'meal']
@@ -46,7 +46,7 @@ const EVENT_TYPES = [
     offers: ['luggage', 'comfort', 'meal']
   }, {
     type: 'Sightseeing',
-    offers: ['comfort', 'seats', 'train']
+    offers: []
   }, {
     type: 'Restaurant',
     offers: ['seats']

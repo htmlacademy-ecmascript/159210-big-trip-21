@@ -113,6 +113,11 @@ export default class EventEditView extends AbstractStatefulView {
     this.#header.element.querySelector('.event__type-list')
       .addEventListener('click', this.#eventTypeListHandler);
 
+    if (this.element.querySelector('.event__available-offers')) {
+      this.element.querySelector('.event__available-offers')
+        .addEventListener('click', this.#offersListChangeHandler);
+    }
+
     this.init();
   }
 
@@ -122,7 +127,7 @@ export default class EventEditView extends AbstractStatefulView {
 
   #submitClickHandler = (evt) => {
     evt.preventDefault();
-    this.#onSubmitClick(EventEditView.parseEventToState(this._state));
+    this.#onSubmitClick(EventEditView.parseStateToEvent(this._state));
   };
 
   #cancelClickHandler = (evt) => {
@@ -143,6 +148,27 @@ export default class EventEditView extends AbstractStatefulView {
       typeAndOffers: {
         type: evt.target.innerText,
         offers: []
+      }
+    });
+  };
+
+  #offersListChangeHandler = (evt) => {
+    if (evt.target.tagName !== 'INPUT') {
+      return;
+    }
+    const target = evt.target.name.replace('event-offer-', '');
+    const isChecked = evt.target.checked;
+    const type = this._state.typeAndOffers.type;
+    const offers = this._state.typeAndOffers.offers;
+    if (isChecked) {
+      offers.push(target);
+    } else {
+      offers.splice(offers.indexOf(target), 1);
+    }
+    this.updateElement({
+      typeAndOffers: {
+        type,
+        offers
       }
     });
   };

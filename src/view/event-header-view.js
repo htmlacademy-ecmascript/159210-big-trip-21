@@ -142,10 +142,4 @@ export default class EventHeaderView extends AbstractStatefulView {
       ...event
     };
   }
-
-  static parseStateToHeader(state) {
-    const event = { ...state };
-
-    return event;
-  }
 }

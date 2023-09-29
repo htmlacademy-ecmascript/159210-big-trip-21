@@ -113,12 +113,13 @@ export default class EventHeaderView extends AbstractStatefulView {
   };
 
   #eventTypeListHandler = (evt) => {
-    if (!evt.target.closest('.event__type-item')) {
-      return;
-    }
     evt.preventDefault();
+
     this.updateElement({
-      eventType: evt.target.closest('label').innerText
+      typeAndOffers: {
+        type: evt.target.innerText,
+        offers: []
+      }
     });
   };
 

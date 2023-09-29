@@ -110,6 +110,8 @@ export default class EventEditView extends AbstractStatefulView {
     this.element.addEventListener('reset', this.#cancelClickHandler);
     this.#header.element.querySelector('.event__input--destination')
       .addEventListener('input', this.#destinationChangeHandler);
+    this.#header.element.querySelector('.event__type-list')
+      .addEventListener('click', this.#eventTypeListHandler);
 
     this.init();
   }
@@ -134,6 +136,15 @@ export default class EventEditView extends AbstractStatefulView {
         destination: evt.target.value
       });
     }
+  };
+
+  #eventTypeListHandler = (evt) => {
+    this.updateElement({
+      typeAndOffers: {
+        type: evt.target.innerText,
+        offers: []
+      }
+    });
   };
 
   static parseEventToState(event) {

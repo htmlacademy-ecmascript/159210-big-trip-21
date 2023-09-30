@@ -1,16 +1,10 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { OFFERS, OFFERS_PRICES, DESTINATIONS,
-  PHOTOS_BORDER_NUMS, PHOTOS_COUNT, PHOTOS_SRC, EVENT_TYPES } from '../const.js';
-import { getRandomInteger } from '../utils/common.js';
+  PHOTOS_SRC, EVENT_TYPES } from '../const.js';
 import EventHeaderView from './event-header-view.js';
 import { RenderPosition, render } from '../framework/render.js';
 
 function createOffersList(event) {
-  //['luggage', 'comfort', 'seats', 'meal']
-  // {
-  //   type: 'Taxi',
-  //     offers: ['luggage', 'comfort']
-  // }
   const eventType = event.typeAndOffers.type;
   const eventOffers = event.typeAndOffers.offers;
   const offersofType = EVENT_TYPES.filter((item) =>
@@ -46,12 +40,12 @@ function createOfferTemplate(event, isOffers) {
   );
 }
 
-function createPhotos() {
-  const count = getRandomInteger(PHOTOS_COUNT.min, PHOTOS_COUNT.max);
+function createPhotos(destination) {
   let photos = '';
-  for (let i = 0; i < count; i++) {
-    photos += `<img class="event__photo" src="${PHOTOS_SRC}${getRandomInteger(PHOTOS_BORDER_NUMS.min, PHOTOS_BORDER_NUMS.max)}" alt="Event photo">\n`;
-  }
+  const destinationPhotos = DESTINATIONS[destination].photos;
+  destinationPhotos.forEach((photo) => {
+    photos += `<img class="event__photo" src="${PHOTOS_SRC}${photo}" alt="Event photo">\n`;
+  });
 
   return photos;
 }
@@ -60,11 +54,11 @@ function createDestinationTemplate({ destination, isDestination }) {
   return (
     isDestination ? `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${DESTINATIONS[destination]}</p>
+      <p class="event__destination-description">${DESTINATIONS[destination].description}</p>
 
       <div class="event__photos-container">
         <div class="event__photos-tape">
-          ${createPhotos()}
+          ${createPhotos(destination)}
         </div>
       </div>
     </section>` : ''

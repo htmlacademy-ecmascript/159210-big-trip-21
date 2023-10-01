@@ -1,4 +1,4 @@
-import { EVENT_TYPES, DESTINATIONS, MAX_PRICE, MIN_PRICE, OFFERS } from '../const.js';
+import { EVENT_TYPES, DESTINATIONS, MAX_PRICE, MIN_PRICE } from '../const.js';
 import { getRandomInteger, getRandomArrayElement, getRandomBoolean, getRandomKey, formalizeTime } from '../utils/common.js';
 import dayjs from 'dayjs';
 import dayjsRandom from 'dayjs-random';
@@ -26,17 +26,26 @@ const getDateTime = () => {
   };
 };
 
-function getRandomOffers() {
-  const offersCount = getRandomInteger(0, Object.keys(OFFERS).length);
+function getRandomOffers(eventType) {
+  const eventOffers = EVENT_TYPES.filter((item) =>
+    item.type === eventType)[0].offers;
+  const offersCount = getRandomInteger(0, eventOffers.length);
   const offersList = [];
   let newOffer;
   for (let i = 0; i < offersCount; i++) {
     do {
-      newOffer = getRandomKey(OFFERS);
+      newOffer = getRandomArrayElement(eventOffers);
     } while (offersList.includes(newOffer));
     offersList.push(newOffer);
   }
   return offersList;
+}
+
+function getEventTypeAndOffers() {
+  const type = getRandomArrayElement(EVENT_TYPES).type;
+  const offers = getRandomOffers(type);
+
+  return {type, offers};
 }
 
 function getNewEvent() {
@@ -44,12 +53,11 @@ function getNewEvent() {
   return {
     id: nanoid(),
     date: newDate.date,
-    eventType: getRandomArrayElement(EVENT_TYPES),
+    typeAndOffers: getEventTypeAndOffers(),
     destination: getRandomKey(DESTINATIONS),
     startTime: newDate.startTime,
     endTime: newDate.endTime,
     price: getRandomInteger(MIN_PRICE, MAX_PRICE),
-    offers: getRandomOffers(),
     isFav: getRandomBoolean()
   };
 }

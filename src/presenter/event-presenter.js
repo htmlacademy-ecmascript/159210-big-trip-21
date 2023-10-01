@@ -2,7 +2,7 @@ import { remove, render, replace } from '../framework/render.js';
 import EventEditView from '../view/event-edit-view.js';
 import EventLineView from '../view/event-line-view.js';
 import ListItemView from '../view/list-item-view.js';
-import { Mode } from '../const.js';
+import { EVENT_TYPES, Mode } from '../const.js';
 
 
 export default class EventPresenter {
@@ -15,6 +15,7 @@ export default class EventPresenter {
 
   #eventContainerComponent = new ListItemView();
   #mode = Mode.DEFAULT;
+  _eventTypes = EVENT_TYPES;
 
   constructor({ eventListComponent, onEventChange, onModeChange }) {
     this.#eventListComponent = eventListComponent;
@@ -36,7 +37,8 @@ export default class EventPresenter {
       event: this.#event,
       onSubmitClick: this.#onSubmitClick,
       onCancelClick: this.#onCancelClick,
-      onRollupClick: this.#onRollupClick
+      onRollupClick: this.#onRollupClick,
+      eventTypes: this._eventTypes
     });
 
     this.#eventEditComponent.init();

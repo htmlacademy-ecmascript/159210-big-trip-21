@@ -1,16 +1,15 @@
 import dayjs from 'dayjs';
-import { OFFERS, OFFERS_PRICES, DATE_FORMAT } from '../const.js';
+import { DATE_FORMAT } from '../const.js';
 import AbstractView from '../framework/view/abstract-view.js';
 import { getEventDuration } from '../utils/event.js';
 
 function createOffersList(offers) {
   let offersList = '';
-
   offers.forEach((offer) => {
     offersList += `<li class="event__offer">
-      <span class="event__offer-title">${OFFERS[offer]}</span>
+      <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;
-      <span class="event__offer-price">${OFFERS_PRICES[offer]}</span>
+      <span class="event__offer-price">${offer.price}</span>
     </li>`;
   });
   return offersList;

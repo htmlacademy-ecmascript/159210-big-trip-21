@@ -1,40 +1,42 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { OFFERS, OFFERS_PRICES, DESTINATIONS,
-  PHOTOS_SRC, EVENT_TYPES } from '../const.js';
+import { OFFERS_KEY_WORDS, DESTINATIONS,
+  PHOTOS_SRC, } from '../const.js';
 import EventHeaderView from './event-header-view.js';
 import { RenderPosition, render } from '../framework/render.js';
 
-function createOffersList(event) {
+function createOffersList(event, eventTypes) {
   const eventType = event.typeAndOffers.type;
   const eventOffers = event.typeAndOffers.offers;
-  const offersofType = EVENT_TYPES.filter((item) =>
+  const offersofType = eventTypes.filter((item) =>
     item.type === eventType)[0].offers;
   let offersList = '';
   offersofType.forEach((offer) => {
+    const keyWord = OFFERS_KEY_WORDS.filter((word) => offer.title.includes(word));
+    const isChecked = eventOffers.some((item) => item.title.includes(keyWord));
     offersList += `<div class="event__offer-selector">
           <input
             class="event__offer-checkbox  visually-hidden"
-            id="event-offer-${offer}-1"
+            id="event-offer-${keyWord}-1"
             type="checkbox"
-            name="event-offer-${offer}"
-            ${eventOffers.includes(offer) ? 'checked' : ''}>
-          <label class="event__offer-label" for="event-offer-${offer}-1">
-            <span class="event__offer-title">${OFFERS[offer]}</span>
+            name="event-offer-${keyWord}"
+            ${isChecked ? 'checked' : ''}>
+          <label class="event__offer-label" for="event-offer-${keyWord}-1">
+            <span class="event__offer-title">${offer.title}</span>
             &plus;&euro;&nbsp;
-            <span class="event__offer-price">${OFFERS_PRICES[offer]}</span>
+            <span class="event__offer-price">${offer.price}</span>
           </label>
         </div>`;
   });
   return offersList;
 }
 
-function createOfferTemplate(event, isOffers) {
+function createOfferTemplate(event, isOffers, eventTypes) {
   return (
     isOffers ? `<section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
       <div class="event__available-offers">
-        ${createOffersList(event)}
+        ${createOffersList(event, eventTypes)}
       </div>
     </section>` : ''
   );
@@ -65,11 +67,11 @@ function createDestinationTemplate({ destination, isDestination }) {
   );
 }
 
-function createEventEditTemplate(event, isOffers, isDestination) {
+function createEventEditTemplate(event, isOffers, isDestination, eventTypes) {
   return (
     `<form class="event event--edit" action="#" method="post">
       <section class="event__details">
-        ${createOfferTemplate(event, isOffers)}
+        ${createOfferTemplate(event, isOffers, eventTypes)}
         ${createDestinationTemplate(event, isDestination)}
       </section>
     </form>`
@@ -81,13 +83,13 @@ export default class EventEditView extends AbstractStatefulView {
   #onSubmitClick = null;
   #onCancelClick = null;
 
-  constructor({ event, onSubmitClick, onCancelClick, onRollupClick }) {
+  constructor({ event, onSubmitClick, onCancelClick, onRollupClick, eventTypes }) {
     super();
-    this._setState(EventEditView.parseEventToState(event));
+    this._eventTypes = eventTypes;
+    this._setState(this.parseEventToState(event));
     this.#header = new EventHeaderView({ event, onRollupClick });
     this.#onSubmitClick = onSubmitClick;
     this.#onCancelClick = onCancelClick;
-
     this._restoreHandlers();
   }
 
@@ -95,7 +97,8 @@ export default class EventEditView extends AbstractStatefulView {
     return createEventEditTemplate(
       this._state,
       this._state.isOffers,
-      this._state.isDestination
+      this._state.isDestination,
+      this._eventTypes
     );
   }
 
@@ -167,12 +170,12 @@ export default class EventEditView extends AbstractStatefulView {
     });
   };
 
-  static parseEventToState(event) {
+  parseEventToState(event) {
     const type = event.typeAndOffers.type;
     return {
       ...event,
       isDestination: event.destination !== null,
-      isOffers: EVENT_TYPES.filter((item) =>
+      isOffers: this._eventTypes.filter((item) =>
         item.type === type)[0].offers.length > 0
     };
   }

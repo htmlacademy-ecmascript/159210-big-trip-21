@@ -16,7 +16,6 @@ function createOffersList(offers) {
 }
 
 function createEventTemplate({ date, typeAndOffers, destination, startTime, price, isFav, endTime}) {
-  console.log(date);
   return (
     `<div class="event">
       <time class="event__date" datetime="2019-03-18">${dayjs(date).format(DATE_FORMAT)}</time>

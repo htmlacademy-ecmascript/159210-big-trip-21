@@ -1,7 +1,15 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { OFFERS_KEY_WORDS, DESTINATIONS, SAVE_DATE_FORMAT } from '../const.js';
+import { OFFERS_KEY_WORDS, DESTINATIONS, SAVE_DATE_FORMAT,
+  DATE_ONLY_FORMAT } from '../const.js';
 import EventHeaderView from './event-header-view.js';
 import { RenderPosition, render } from '../framework/render.js';
+import dayjs from 'dayjs';
+
+function parseDateFromPicker(string) {
+  const enterDate = string.split(' ')[0].split('/');
+  const enterTime = string.split(' ')[1];
+  return `${enterDate[1]}/${enterDate[0]}/${enterDate[2]} ${enterTime}`;
+}
 
 function createOffersList(event, eventTypes) {
   const eventType = event.typeAndOffers.type;
@@ -115,10 +123,9 @@ export default class EventEditView extends AbstractStatefulView {
         .addEventListener('click', this.#offersListChangeHandler);
     }
 
-    this.#header.element.querySelector('#event-start-time-1')
-      .addEventListener('change', this.#datesChangeHandler);
-    this.#header.element.querySelector('#event-end-time-1')
-      .addEventListener('change', this.#datesChangeHandler);
+    this.#header.element.querySelectorAll('.event__input--time')
+      .forEach((field) =>
+        field.addEventListener('change', this.#datesChangeHandler));
 
     this.init();
   }
@@ -177,25 +184,20 @@ export default class EventEditView extends AbstractStatefulView {
   };
 
   #datesChangeHandler = (evt) => {
-    //даты сохраняются некорректно
-    //2023-04-23T14:35
+    const newDate = parseDateFromPicker(evt.target.value);
 
-    const dateArray = evt.target.value.split(' ')[0].split('/');
-    const time = evt.target.value.split(' ')[1];
-    const newDate = `20${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`;
-    const newDateTime = `20${dateArray[2]}-${dateArray[1]}-${dateArray[0]}T${time}`;
-    console.log(evt.target);
-    // if (evt.target.name.includes('start')) {
-    //   this.updateElement({
-    //     startTime: evt.target.value,
-    //     date: newDate
-    //   });
-    // }
-    // if (evt.target.name.includes('end')) {
-    //   this.updateElement({
-    //     endTime: evt.target.value
-    //   });
-    // }
+    if (evt.target.name.includes('start')) {
+      this.updateElement({
+        startTime: dayjs(newDate).format(SAVE_DATE_FORMAT),
+        date: dayjs(newDate).format(DATE_ONLY_FORMAT),
+      });
+    }
+
+    if (evt.target.name.includes('end')) {
+      this.updateElement({
+        endTime: dayjs(newDate).format(SAVE_DATE_FORMAT)
+      });
+    }
   };
 
   parseEventToState(event) {

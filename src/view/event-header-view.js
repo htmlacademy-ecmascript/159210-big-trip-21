@@ -1,4 +1,5 @@
-import { DESTINATIONS, EDIT_DATE_FORMAT, EVENT_TYPES, SAVE_DATE_FORMAT } from '../const.js';
+import { DESTINATIONS, EVENT_TYPES, PICKER_DATE_FORMAT,
+  SAVE_DATE_FORMAT, EDIT_DATE_FORMAT } from '../const.js';
 import dayjs from 'dayjs';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
@@ -32,7 +33,6 @@ function createDestinationOptions() {
 }
 
 function createEventHeaderTemplate({ typeAndOffers, price, destination, startTime, endTime }) {
-  console.log(startTime);
   return (
     `<header class="event__header">
       <div class="event__type-wrapper">
@@ -67,7 +67,7 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           id="event-start-time-1"
           type="text"
           name="event-start-time"
-          value="${startTime}">
+          value="${dayjs(startTime).format(PICKER_DATE_FORMAT) }">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
         <input
@@ -75,7 +75,7 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           id="event-end-time-1"
           type="text"
           name="event-end-time"
-          value="${dayjs(endTime).format(EDIT_DATE_FORMAT)}">
+          value="${dayjs(endTime).format(PICKER_DATE_FORMAT)}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -115,11 +115,15 @@ export default class EventHeaderView extends AbstractStatefulView {
   removeElement() {
     super.removeElement();
 
-    this.#datePickerFrom.destroy();
-    this.#datePickerFrom = null;
+    if (this.#datePickerFrom) {
+      this.#datePickerFrom.destroy();
+      this.#datePickerFrom = null;
+    }
 
-    this.#datePickerTo.destroy();
-    this.#datePickerTo = null;
+    if (this.#datePickerTo) {
+      this.#datePickerTo.destroy();
+      this.#datePickerTo = null;
+    }
   }
 
   _restoreHandlers() {
@@ -149,32 +153,36 @@ export default class EventHeaderView extends AbstractStatefulView {
       dateFromElement,
       {
         ...commonConfig,
-        defaultDate: this._state.startTime,
-        onClose: this.#startDateChangeHandler,
+        defaultDate: dayjs(this._state.startTime).format(EDIT_DATE_FORMAT),
+        onClose: this.#dateFromCloseHandler,
+        maxDate: Date.parse(this._state.endTime),
       },
     );
     this.#datePickerTo = flatpickr(
       dateToElement,
       {
         ...commonConfig,
-        defaultDate: this._state.endTime,
+        defaultDate: dayjs(this._state.endTime).format(EDIT_DATE_FORMAT),
         onClose: this.#endDateChangeHandler,
-        minDate: this._state.startTime,
+        minDate: Date.parse(this._state.startTime),
       },
     );
   }
 
-  #startDateChangeHandler = ([userDate]) => {
-    console.log(dayjs(userDate).format(SAVE_DATE_FORMAT));
-    this.updateElement({
+  #dateFromCloseHandler = ([userDate]) => {
+    this._setState({
+      ...this._setState,
       startTime: dayjs(userDate).format(SAVE_DATE_FORMAT)
     });
+    this.#datePickerTo.set('minDate', this._state.startTime);
   };
 
   #endDateChangeHandler = ([userDate]) => {
-    this.updateElement({
+    this._setState({
+      ...this._setState,
       endTime: dayjs(userDate).format(SAVE_DATE_FORMAT)
     });
+    this.#datePickerFrom.set('maxDate', this._state.endTime);
   };
 
   #rollupClickHandler = (evt) => {

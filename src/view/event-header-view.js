@@ -1,6 +1,9 @@
-import { DESTINATIONS, EDIT_DATE_FORMAT, EVENT_TYPES } from '../const.js';
+import { DESTINATIONS, EDIT_DATE_FORMAT, EVENT_TYPES, SAVE_DATE_FORMAT } from '../const.js';
 import dayjs from 'dayjs';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
 
 function createEventTypeItems () {
   let itemsList = '';
@@ -58,10 +61,20 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(startTime).format(EDIT_DATE_FORMAT)}">
+        <input
+          class="event__input  event__input--time"
+          id="event-start-time-1"
+          type="text"
+          name="event-start-time"
+          value="${dayjs(startTime).format(EDIT_DATE_FORMAT)}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(endTime).format(EDIT_DATE_FORMAT)}">
+        <input
+          class="event__input  event__input--time"
+          id="event-end-time-1"
+          type="text"
+          name="event-end-time"
+          value="${dayjs(endTime).format(EDIT_DATE_FORMAT)}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -83,6 +96,8 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
 
 export default class EventHeaderView extends AbstractStatefulView {
   #onRollupClick = null;
+  #startDatePicker = null;
+  #endDatePicker = null;
 
   constructor({ event, onRollupClick }) {
     super();
@@ -96,6 +111,16 @@ export default class EventHeaderView extends AbstractStatefulView {
     return createEventHeaderTemplate(this._state);
   }
 
+  removeElement() {
+    super.removeElement();
+
+    this.#startDatePicker.destroy();
+    this.#startDatePicker = null;
+
+    this.#endDatePicker.destroy();
+    this.#endDatePicker = null;
+  }
+
   _restoreHandlers() {
     this.element.querySelector('.event__rollup-btn')
       .addEventListener('click', this.#rollupClickHandler);
@@ -105,7 +130,42 @@ export default class EventHeaderView extends AbstractStatefulView {
       .addEventListener('input', this.#destinationChangeHandler);
     this.element.querySelector('.event__input--price')
       .addEventListener('blur', this.#priceChangeHandler);
+
+    this.#setDates();
   }
+
+  #setDates() {
+    this.#startDatePicker = flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        enableTime: true,
+        defaultDate: dayjs(this._state.startTime).format(EDIT_DATE_FORMAT),
+        dateFormat: 'd/m/y H:i',
+        onChange: this.#startDateChangeHandler,
+      },
+    );
+    this.#endDatePicker = flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        enableTime: true,
+        defaultDate: dayjs(this._state.endTime).format(EDIT_DATE_FORMAT),
+        dateFormat: 'd/m/y H:i',
+        onChange: this.#endDateChangeHandler,
+      },
+    );
+  }
+
+  #startDateChangeHandler = ([userDate]) => {
+    this.updateElement({
+      startTime: dayjs(userDate).format(SAVE_DATE_FORMAT)
+    });
+  };
+
+  #endDateChangeHandler = ([userDate]) => {
+    this.updateElement({
+      endTime: dayjs(userDate).format(SAVE_DATE_FORMAT)
+    });
+  };
 
   #rollupClickHandler = (evt) => {
     evt.preventDefault();

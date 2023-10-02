@@ -115,6 +115,11 @@ export default class EventEditView extends AbstractStatefulView {
         .addEventListener('click', this.#offersListChangeHandler);
     }
 
+    this.#header.element.querySelector('#event-start-time-1')
+      .addEventListener('change', this.#datesChangeHandler);
+    this.#header.element.querySelector('#event-end-time-1')
+      .addEventListener('change', this.#datesChangeHandler);
+
     this.init();
   }
 
@@ -169,6 +174,21 @@ export default class EventEditView extends AbstractStatefulView {
         offers
       }
     });
+  };
+
+  #datesChangeHandler = (evt) => {
+    //даты сохраняются некорректно
+    if (evt.target.name.includes('start')) {
+      this.updateElement({
+        startTime: evt.target.value,
+        date: Date.parse(evt.target.value.split(' ')[0])
+      });
+    }
+    if (evt.target.name.includes('end')) {
+      this.updateElement({
+        endTime: evt.target.value
+      });
+    }
   };
 
   parseEventToState(event) {

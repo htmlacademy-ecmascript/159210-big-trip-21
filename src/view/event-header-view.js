@@ -22,9 +22,9 @@ function createEventTypeItems () {
 
 function createDestinationOptions() {
   let optionsList = '';
-  for (const [key] of Object.entries(DESTINATIONS)) {
-    optionsList += `<option value="${key}"></option>`;
-  }
+  DESTINATIONS.forEach((item) => {
+    optionsList += `<option value="${item.name}"></option>`;
+  });
   return optionsList;
 }
 

@@ -1,6 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { OFFERS_KEY_WORDS, DESTINATIONS,
-  PHOTOS_SRC, } from '../const.js';
+import { OFFERS_KEY_WORDS, DESTINATIONS } from '../const.js';
 import EventHeaderView from './event-header-view.js';
 import { RenderPosition, render } from '../framework/render.js';
 
@@ -44,19 +43,20 @@ function createOfferTemplate(event, isOffers, eventTypes) {
 
 function createPhotos(destination) {
   let photos = '';
-  const destinationPhotos = DESTINATIONS[destination].photos;
+  const destinationPhotos = DESTINATIONS.filter((item) => item.name === destination)[0].pictures;
   destinationPhotos.forEach((photo) => {
-    photos += `<img class="event__photo" src="${PHOTOS_SRC}${photo}" alt="Event photo">\n`;
+    photos += `<img class="event__photo" src="${photo.src}" alt="${photo.description}">\n`;
   });
 
   return photos;
 }
 
 function createDestinationTemplate({ destination, isDestination }) {
+  const currentDestinationInfo = DESTINATIONS.filter((item) => item.name === destination)[0];
   return (
     isDestination ? `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${DESTINATIONS[destination].description}</p>
+      <p class="event__destination-description">${currentDestinationInfo.description}</p>
 
       <div class="event__photos-container">
         <div class="event__photos-tape">
@@ -133,7 +133,8 @@ export default class EventEditView extends AbstractStatefulView {
   };
 
   #destinationChangeHandler = (evt) => {
-    if (Object.keys(DESTINATIONS).includes(evt.target.value)) {
+    const newDestination = DESTINATIONS.filter((item) => item.name === evt.target.value);
+    if (newDestination.length > 0) {
       this.updateElement({
         destination: evt.target.value
       });

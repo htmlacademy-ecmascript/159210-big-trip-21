@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { OFFERS_KEY_WORDS, DESTINATIONS } from '../const.js';
+import { OFFERS_KEY_WORDS, DESTINATIONS, SAVE_DATE_FORMAT } from '../const.js';
 import EventHeaderView from './event-header-view.js';
 import { RenderPosition, render } from '../framework/render.js';
 
@@ -178,17 +178,24 @@ export default class EventEditView extends AbstractStatefulView {
 
   #datesChangeHandler = (evt) => {
     //даты сохраняются некорректно
-    if (evt.target.name.includes('start')) {
-      this.updateElement({
-        startTime: evt.target.value,
-        date: Date.parse(evt.target.value.split(' ')[0])
-      });
-    }
-    if (evt.target.name.includes('end')) {
-      this.updateElement({
-        endTime: evt.target.value
-      });
-    }
+    //2023-04-23T14:35
+
+    const dateArray = evt.target.value.split(' ')[0].split('/');
+    const time = evt.target.value.split(' ')[1];
+    const newDate = `20${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`;
+    const newDateTime = `20${dateArray[2]}-${dateArray[1]}-${dateArray[0]}T${time}`;
+    console.log(evt.target);
+    // if (evt.target.name.includes('start')) {
+    //   this.updateElement({
+    //     startTime: evt.target.value,
+    //     date: newDate
+    //   });
+    // }
+    // if (evt.target.name.includes('end')) {
+    //   this.updateElement({
+    //     endTime: evt.target.value
+    //   });
+    // }
   };
 
   parseEventToState(event) {

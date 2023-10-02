@@ -32,6 +32,7 @@ function createDestinationOptions() {
 }
 
 function createEventHeaderTemplate({ typeAndOffers, price, destination, startTime, endTime }) {
+  console.log(startTime);
   return (
     `<header class="event__header">
       <div class="event__type-wrapper">
@@ -66,7 +67,7 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           id="event-start-time-1"
           type="text"
           name="event-start-time"
-          value="${dayjs(startTime).format(EDIT_DATE_FORMAT)}">
+          value="${startTime}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
         <input
@@ -96,8 +97,8 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
 
 export default class EventHeaderView extends AbstractStatefulView {
   #onRollupClick = null;
-  #startDatePicker = null;
-  #endDatePicker = null;
+  #datePickerFrom = null;
+  #datePickerTo = null;
 
   constructor({ event, onRollupClick }) {
     super();
@@ -114,11 +115,11 @@ export default class EventHeaderView extends AbstractStatefulView {
   removeElement() {
     super.removeElement();
 
-    this.#startDatePicker.destroy();
-    this.#startDatePicker = null;
+    this.#datePickerFrom.destroy();
+    this.#datePickerFrom = null;
 
-    this.#endDatePicker.destroy();
-    this.#endDatePicker = null;
+    this.#datePickerTo.destroy();
+    this.#datePickerTo = null;
   }
 
   _restoreHandlers() {
@@ -131,31 +132,40 @@ export default class EventHeaderView extends AbstractStatefulView {
     this.element.querySelector('.event__input--price')
       .addEventListener('blur', this.#priceChangeHandler);
 
-    this.#setDates();
+    this.#setDatePickers();
   }
 
-  #setDates() {
-    this.#startDatePicker = flatpickr(
-      this.element.querySelector('#event-start-time-1'),
+  #setDatePickers() {
+    const [dateFromElement, dateToElement] = this.element.querySelectorAll('.event__input--time');
+    const commonConfig = {
+      enableTime: true,
+      dateFormat: 'd/m/y H:i',
+      locale: {
+        firstDayOfWeek: 1,
+      },
+      'time_24h': true
+    };
+    this.#datePickerFrom = flatpickr(
+      dateFromElement,
       {
-        enableTime: true,
-        defaultDate: dayjs(this._state.startTime).format(EDIT_DATE_FORMAT),
-        dateFormat: 'd/m/y H:i',
-        onChange: this.#startDateChangeHandler,
+        ...commonConfig,
+        defaultDate: this._state.startTime,
+        onClose: this.#startDateChangeHandler,
       },
     );
-    this.#endDatePicker = flatpickr(
-      this.element.querySelector('#event-end-time-1'),
+    this.#datePickerTo = flatpickr(
+      dateToElement,
       {
-        enableTime: true,
-        defaultDate: dayjs(this._state.endTime).format(EDIT_DATE_FORMAT),
-        dateFormat: 'd/m/y H:i',
-        onChange: this.#endDateChangeHandler,
+        ...commonConfig,
+        defaultDate: this._state.endTime,
+        onClose: this.#endDateChangeHandler,
+        minDate: this._state.startTime,
       },
     );
   }
 
   #startDateChangeHandler = ([userDate]) => {
+    console.log(dayjs(userDate).format(SAVE_DATE_FORMAT));
     this.updateElement({
       startTime: dayjs(userDate).format(SAVE_DATE_FORMAT)
     });

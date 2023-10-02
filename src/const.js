@@ -4,7 +4,7 @@ const MIN_PRICE = 100;
 const MAX_PRICE = 1000;
 const DATE_FORMAT = 'DD MMM';
 const EDIT_DATE_FORMAT = 'DD/MM/YYTHH:mm';
-const SAVE_DATE_FORMAT = 'YYYY-MM-DDTHH:mm';
+const SAVE_DATE_FORMAT = 'YYYY-MM-DD';
 
 const PHOTOS_SRC = 'https://loremflickr.com/248/152?random=';
 

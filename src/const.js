@@ -2,11 +2,14 @@ const ENTRY_COUNT = 4;
 const MINUTES_ROUND = 5;
 const MIN_PRICE = 100;
 const MAX_PRICE = 1000;
-const DATE_FORMAT = 'DD MMM';
-const EDIT_DATE_FORMAT = 'DD/MM/YYTHH:mm';
-const PICKER_DATE_FORMAT = 'DD/MM/YY HH:mm';
-const SAVE_DATE_FORMAT = 'YYYY-MM-DDTHH:mm';
-const DATE_ONLY_FORMAT = 'YYYY-MM-DD';
+
+const DATE_FORMAT = {
+  shortFormat: 'DD MMM',
+  pickerFormat: 'DD/MM/YY HH:mm',
+  editFormat: 'DD/MM/YYTHH:mm',
+  saveFormat: 'YYYY-MM-DDTHH:mm',
+  dateOnlyFormat: 'YYYY-MM-DD'
+};
 
 const PHOTOS_SRC = 'https://loremflickr.com/248/152?random=';
 
@@ -238,10 +241,6 @@ export {
   EVENT_TYPES,
   SORT_EVENTS,
   DEFAULT_FILTER,
-  EDIT_DATE_FORMAT,
-  PICKER_DATE_FORMAT,
-  DATE_ONLY_FORMAT,
-  SAVE_DATE_FORMAT,
   DESTINATIONS,
   FilterType,
   Mode,

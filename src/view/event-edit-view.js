@@ -1,15 +1,7 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { OFFERS_KEY_WORDS, DESTINATIONS, SAVE_DATE_FORMAT,
-  DATE_ONLY_FORMAT } from '../const.js';
+import { OFFERS_KEY_WORDS, DESTINATIONS, EVENT_TYPES } from '../const.js';
 import EventHeaderView from './event-header-view.js';
 import { RenderPosition, render } from '../framework/render.js';
-import dayjs from 'dayjs';
-
-function parseDateFromPicker(string) {
-  const enterDate = string.split(' ')[0].split('/');
-  const enterTime = string.split(' ')[1];
-  return `${enterDate[1]}/${enterDate[0]}/${enterDate[2]} ${enterTime}`;
-}
 
 function createOffersList(event, eventTypes) {
   const eventType = event.typeAndOffers.type;
@@ -60,7 +52,10 @@ function createPhotos(destination) {
 }
 
 function createDestinationTemplate({ destination, isDestination }) {
-  const currentDestinationInfo = DESTINATIONS.filter((item) => item.name === destination)[0];
+  let currentDestinationInfo;
+  if (isDestination) {
+    currentDestinationInfo = DESTINATIONS.filter((item) => item.name === destination)[0];
+  }
   return (
     isDestination ? `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
@@ -95,9 +90,13 @@ export default class EventEditView extends AbstractStatefulView {
     super();
     this._eventTypes = eventTypes;
     this._setState(this.parseEventToState(event));
-    this.#header = new EventHeaderView({ event, onRollupClick });
     this.#onSubmitClick = onSubmitClick;
     this.#onCancelClick = onCancelClick;
+    this.#header = new EventHeaderView({
+      event,
+      onRollupClick,
+      onSubmitClick: this.#submitClickHandler});
+
     this._restoreHandlers();
   }
 
@@ -123,10 +122,6 @@ export default class EventEditView extends AbstractStatefulView {
         .addEventListener('click', this.#offersListChangeHandler);
     }
 
-    this.#header.element.querySelectorAll('.event__input--time')
-      .forEach((field) =>
-        field.addEventListener('change', this.#datesChangeHandler));
-
     this.init();
   }
 
@@ -134,9 +129,15 @@ export default class EventEditView extends AbstractStatefulView {
     render(this.#header, this.element, RenderPosition.AFTERBEGIN);
   }
 
-  #submitClickHandler = (evt) => {
-    evt.preventDefault();
-    this.#onSubmitClick(EventEditView.parseStateToEvent(this._state));
+  #submitClickHandler = ({ destination, type, date, startTime, endTime }) => {
+    this.#onSubmitClick(EventEditView.parseStateToEvent({
+      ...this._state,
+      destination,
+      type,
+      date,
+      startTime,
+      endTime
+    }));
   };
 
   #cancelClickHandler = (evt) => {
@@ -145,12 +146,10 @@ export default class EventEditView extends AbstractStatefulView {
   };
 
   #destinationChangeHandler = (evt) => {
-    const newDestination = DESTINATIONS.filter((item) => item.name === evt.target.value);
-    if (newDestination.length > 0) {
-      this.updateElement({
-        destination: evt.target.value
-      });
-    }
+    this.updateElement({
+      isDestination: evt.target.value !== '',
+      destination: evt.target.value
+    });
   };
 
   #eventTypeListHandler = (evt) => {
@@ -166,14 +165,20 @@ export default class EventEditView extends AbstractStatefulView {
     if (evt.target.tagName !== 'INPUT') {
       return;
     }
-    const target = evt.target.name.replace('event-offer-', '');
+    const targetWord = evt.target.name.replace('event-offer-', '');
     const isChecked = evt.target.checked;
     const type = this._state.typeAndOffers.type;
     const offers = this._state.typeAndOffers.offers;
+
     if (isChecked) {
-      offers.push(target);
+      const smth = EVENT_TYPES.filter((item) =>
+        item.type === type)[0].offers.filter((offer) =>
+        offer.title.includes(targetWord));
+      offers.push(smth[0]);
     } else {
-      offers.splice(offers.indexOf(target), 1);
+      const targetIndex = offers.findIndex((item) =>
+        item.title.includes(targetWord));
+      offers.splice(targetIndex, 1);
     }
     this.updateElement({
       typeAndOffers: {
@@ -181,23 +186,6 @@ export default class EventEditView extends AbstractStatefulView {
         offers
       }
     });
-  };
-
-  #datesChangeHandler = (evt) => {
-    const newDate = parseDateFromPicker(evt.target.value);
-
-    if (evt.target.name.includes('start')) {
-      this.updateElement({
-        startTime: dayjs(newDate).format(SAVE_DATE_FORMAT),
-        date: dayjs(newDate).format(DATE_ONLY_FORMAT),
-      });
-    }
-
-    if (evt.target.name.includes('end')) {
-      this.updateElement({
-        endTime: dayjs(newDate).format(SAVE_DATE_FORMAT)
-      });
-    }
   };
 
   parseEventToState(event) {

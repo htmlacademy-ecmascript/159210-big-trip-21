@@ -1,5 +1,4 @@
-import { DESTINATIONS, EVENT_TYPES, PICKER_DATE_FORMAT,
-  SAVE_DATE_FORMAT, EDIT_DATE_FORMAT } from '../const.js';
+import { DESTINATIONS, EVENT_TYPES, DATE_FORMAT } from '../const.js';
 import dayjs from 'dayjs';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
@@ -67,7 +66,7 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           id="event-start-time-1"
           type="text"
           name="event-start-time"
-          value="${dayjs(startTime).format(PICKER_DATE_FORMAT) }">
+          value="${dayjs(startTime).format(DATE_FORMAT.pickerFormat) }">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
         <input
@@ -75,7 +74,7 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           id="event-end-time-1"
           type="text"
           name="event-end-time"
-          value="${dayjs(endTime).format(PICKER_DATE_FORMAT)}">
+          value="${dayjs(endTime).format(DATE_FORMAT.pickerFormat)}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -99,11 +98,13 @@ export default class EventHeaderView extends AbstractStatefulView {
   #onRollupClick = null;
   #datePickerFrom = null;
   #datePickerTo = null;
+  #onSubmitClick = null;
 
-  constructor({ event, onRollupClick }) {
+  constructor({ event, onRollupClick, onSubmitClick }) {
     super();
     this._setState(EventHeaderView.parseHeaderToState(event));
     this.#onRollupClick = onRollupClick;
+    this.#onSubmitClick = onSubmitClick;
 
     this._restoreHandlers();
   }
@@ -127,6 +128,8 @@ export default class EventHeaderView extends AbstractStatefulView {
   }
 
   _restoreHandlers() {
+    this.element.querySelector('.event__save-btn')
+      .addEventListener('click', this.#submitClickHandler);
     this.element.querySelector('.event__rollup-btn')
       .addEventListener('click', this.#rollupClickHandler);
     this.element.querySelector('.event__type-list')
@@ -153,7 +156,7 @@ export default class EventHeaderView extends AbstractStatefulView {
       dateFromElement,
       {
         ...commonConfig,
-        defaultDate: dayjs(this._state.startTime).format(EDIT_DATE_FORMAT),
+        defaultDate: dayjs(this._state.startTime).format(DATE_FORMAT.editFormat),
         onClose: this.#dateFromCloseHandler,
         maxDate: Date.parse(this._state.endTime),
       },
@@ -162,8 +165,8 @@ export default class EventHeaderView extends AbstractStatefulView {
       dateToElement,
       {
         ...commonConfig,
-        defaultDate: dayjs(this._state.endTime).format(EDIT_DATE_FORMAT),
-        onClose: this.#endDateChangeHandler,
+        defaultDate: dayjs(this._state.endTime).format(DATE_FORMAT.editFormat),
+        onClose: this.#dateToChangeHandler,
         minDate: Date.parse(this._state.startTime),
       },
     );
@@ -172,17 +175,23 @@ export default class EventHeaderView extends AbstractStatefulView {
   #dateFromCloseHandler = ([userDate]) => {
     this._setState({
       ...this._setState,
-      startTime: dayjs(userDate).format(SAVE_DATE_FORMAT)
+      startTime: dayjs(userDate).format(DATE_FORMAT.saveFormat),
+      date: dayjs(userDate).format(DATE_FORMAT.dateOnlyFormat)
     });
     this.#datePickerTo.set('minDate', this._state.startTime);
   };
 
-  #endDateChangeHandler = ([userDate]) => {
+  #dateToChangeHandler = ([userDate]) => {
     this._setState({
       ...this._setState,
-      endTime: dayjs(userDate).format(SAVE_DATE_FORMAT)
+      endTime: dayjs(userDate).format(DATE_FORMAT.saveFormat)
     });
     this.#datePickerFrom.set('maxDate', this._state.endTime);
+  };
+
+  #submitClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onSubmitClick(this._state);
   };
 
   #rollupClickHandler = (evt) => {
@@ -202,11 +211,9 @@ export default class EventHeaderView extends AbstractStatefulView {
   };
 
   #destinationChangeHandler = (evt) => {
-    if(Object.keys(DESTINATIONS).includes(evt.target.value)) {
-      this.updateElement({
-        destination: evt.target.value
-      });
-    }
+    this.updateElement({
+      destination: evt.target.value
+    });
   };
 
   #priceChangeHandler = (evt) => {

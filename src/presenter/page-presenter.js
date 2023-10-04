@@ -4,7 +4,6 @@ import { render } from '../framework/render.js';
 import { sortByDate, sortByDuration, sortByPrice } from '../utils/event.js';
 import EmptyListView from '../view/empty-list-view.js';
 import EventPresenter from './event-presenter.js';
-import { updateEvent } from '../utils/event.js';
 import { SortType } from '../const.js';
 
 export default class PagePresenter {
@@ -12,7 +11,6 @@ export default class PagePresenter {
   #eventsModel = null;
   #sortComponent = null;
 
-  #events = [];
   #listComponent = new ListView();
   #emptyEventList = new EmptyListView();
   #eventPresenters = new Map();
@@ -24,15 +22,24 @@ export default class PagePresenter {
   }
 
   get events() {
-    return this.#eventsModel.events;
+    switch (this.#currentSortType) {
+      case SortType.DAY.name:
+        return [...this.#eventsModel.events].sort(sortByDate);
+
+      case SortType.TIME.name:
+        return [...this.#eventsModel.events].sort(sortByDuration);
+
+      case SortType.PRICE.name:
+      default:
+        return [...this.#eventsModel.events].sort(sortByPrice);
+    }
   }
 
   init() {
 
-    this.#events = [...this.#eventsModel.events];
     this.#renderSort();
 
-    if (this.#events.length > 0) {
+    if (this.events.length > 0) {
       this.#renderEventList();
     } else {
       this.#renderEmptyEventList();
@@ -40,12 +47,11 @@ export default class PagePresenter {
   }
 
   #renderEventList() {
-    this.#sortEvents(this.#currentSortType);
 
     render(this.#listComponent, this.#container);
 
-    for (let i = 0; i < this.#events.length; i++) {
-      this.#renderEvent(this.#events[i]);
+    for (let i = 0; i < this.events.length; i++) {
+      this.#renderEvent(this.events[i]);
     }
   }
 
@@ -76,24 +82,6 @@ export default class PagePresenter {
       .find(({ isChecked }) => isChecked)?.name;
   }
 
-  #sortEvents(sortType) {
-    this.#currentSortType = sortType;
-    switch (sortType) {
-      case SortType.DAY.name:
-        this.#events = sortByDate(this.#events);
-        break;
-
-      case SortType.TIME.name:
-        this.#events = sortByDuration(this.#events);
-        break;
-
-      case SortType.PRICE.name:
-      default:
-        this.#events = sortByPrice(this.#events);
-        break;
-    }
-  }
-
   #clearEventList() {
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
@@ -104,13 +92,12 @@ export default class PagePresenter {
       return;
     }
 
-    this.#sortEvents(sortType);
+    this.#currentSortType = sortType;
     this.#clearEventList();
     this.#renderEventList();
   };
 
   #onEventChange = (updatedEvent) => {
-    this.#events = updateEvent(this.#events, updatedEvent);
     this.#eventPresenters.get(updatedEvent.id).init(updatedEvent);
   };
 

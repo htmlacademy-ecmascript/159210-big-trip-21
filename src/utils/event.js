@@ -35,19 +35,16 @@ function compareNumbers(dataA, dataB) {
   return dataA - dataB;
 }
 
-const sortByDate = (arrayOfObjects) =>
-  arrayOfObjects.sort((a, b) => compareNumbers(Date.parse(a.date), Date.parse(b.date)));
+const sortByDate = (a, b) =>
+  compareNumbers(Date.parse(a.date), Date.parse(b.date));
 
-const sortByDuration = (arrayOfObjects) =>
-  arrayOfObjects.sort((a, b) =>
-    compareNumbers(
-      dayjs(Date.parse(a.endTime)).diff(Date.parse(a.startTime), 'millisecond'),
-      dayjs(Date.parse(b.endTime)).diff(Date.parse(b.startTime), 'millisecond')
-    )
+const sortByDuration = (a, b) =>
+  compareNumbers(
+    dayjs(Date.parse(a.endTime)).diff(Date.parse(a.startTime), 'millisecond'),
+    dayjs(Date.parse(b.endTime)).diff(Date.parse(b.startTime), 'millisecond')
   );
 
-const sortByPrice = (arrayOfObjects) =>
-  arrayOfObjects.sort((a, b) => compareNumbers(a.price, b.price));
+const sortByPrice = (a, b) => compareNumbers(a.price, b.price);
 
 export { getEventDuration, isDateInFuture, isDateToday, isDateInPast, updateEvent,
   sortByDate, sortByDuration, sortByPrice };

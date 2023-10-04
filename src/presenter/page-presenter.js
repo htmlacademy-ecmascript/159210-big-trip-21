@@ -23,6 +23,10 @@ export default class PagePresenter {
     this.#eventsModel = eventsModel;
   }
 
+  get events() {
+    return this.#eventsModel.events;
+  }
+
   init() {
 
     this.#events = [...this.#eventsModel.events];

@@ -2,6 +2,7 @@ import { DESTINATIONS, EVENT_TYPES, DATE_FORMAT, EDIT_TYPE } from '../const.js';
 import dayjs from 'dayjs';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
+import he from 'he';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -62,7 +63,7 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           id="event-destination-1"
           type="text"
           name="event-destination"
-          value="${destination === null ? '' : destination}" list="destination-list-1">
+          value="${destination === null ? '' : he.encode(destination)}" list="destination-list-1">
         <datalist id="destination-list-1">
           ${createDestinationOptions()}
         </datalist>
@@ -91,7 +92,9 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           <span class="visually-hidden">Price</span>
           &euro;${price}
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="">
+        <input
+          class="event__input  event__input--price"
+          id="event-price-1" type="text" name="event-price" value="">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -226,13 +229,13 @@ export default class EventHeaderView extends AbstractStatefulView {
 
   #destinationChangeHandler = (evt) => {
     this.updateElement({
-      destination: evt.target.value
+      destination: he.encode(evt.target.value)
     });
   };
 
   #priceChangeHandler = (evt) => {
     this.updateElement({
-      price: evt.target.value
+      price: he.encode(evt.target.value)
     });
   };
 

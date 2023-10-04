@@ -2,24 +2,21 @@ const ENTRY_COUNT = 4;
 const MINUTES_ROUND = 5;
 const MIN_PRICE = 100;
 const MAX_PRICE = 1000;
-const DATE_FORMAT = 'DD MMM';
-const EDIT_DATE_FORMAT = 'DD/MM/YY HH:mm';
+
+const DATE_FORMAT = {
+  shortFormat: 'DD MMM',
+  pickerFormat: 'DD/MM/YY HH:mm',
+  editFormat: 'DD/MM/YYTHH:mm',
+  saveFormat: 'YYYY-MM-DDTHH:mm',
+  dateOnlyFormat: 'YYYY-MM-DD'
+};
 
 const PHOTOS_SRC = 'https://loremflickr.com/248/152?random=';
-
-const PHOTOS_BORDER_NUMS = {
-  min: 100,
-  max: 200
-};
 
 const MAX_TIME = {
   HOURS: 24,
   MINUTES: 60,
   DAYS: 31
-};
-const PHOTOS_COUNT = {
-  min: 3,
-  max: 6
 };
 
 const OFFERS_KEY_WORDS = [
@@ -127,20 +124,63 @@ const EVENT_TYPES = [
   }
 ];
 
-const DESTINATIONS = {
-  Amsterdam: {
+const DESTINATIONS = [
+  {
     description: 'Рекомендуется совершить прогулку на лодке по каналам города и Озеру Любви, однако не надо забывать, что антарктический пояс связывает культурный ландшафт, несмотря на это, обратный обмен болгарской валюты при выезде ограничен.',
-    photos: [1, 2, 3, 4]
-  },
-  Geneva: {
+    name: 'Amsterdam',
+    pictures: [
+      {
+        src: `${PHOTOS_SRC}1`,
+        description: 'Amsterdam photo 1'
+      }, {
+        src: `${PHOTOS_SRC}2`,
+        description: 'Amsterdam photo 2'
+      }, {
+        src: `${PHOTOS_SRC}3`,
+        description: 'Amsterdam photo 3'
+      }, {
+        src: `${PHOTOS_SRC}4`,
+        description: 'Amsterdam photo 4'
+      }
+    ]
+  }, {
     description: 'Бенгальский залив, куда входят Пик-Дистрикт, Сноудония и другие многочисленные национальные резерваты природы и парки, неравномерен. Добыча жемчуга перевозит подземный сток. Бенгальский залив недоступно иллюстрирует культурный альбатрос.',
-    photos: [5, 6, 7, 8, 9]
-  },
-  Chamonix: {
+    name: 'Geneva',
+    pictures: [
+      {
+        src: `${PHOTOS_SRC}5`,
+        description: 'Geneva photo 1'
+      }, {
+        src: `${PHOTOS_SRC}6`,
+        description: 'Geneva photo 2'
+      }, {
+        src: `${PHOTOS_SRC}7`,
+        description: 'Geneva photo 3'
+      }, {
+        src: `${PHOTOS_SRC}8`,
+        description: 'Geneva photo 4'
+      }, {
+        src: `${PHOTOS_SRC}9`,
+        description: 'Geneva photo 5'
+      }
+    ]
+  }, {
     description: 'Нижнее течение, на первый взгляд, вразнобой притягивает широкий официальный язык, именно здесь с 8.00 до 11.00 идет оживленная торговля с лодок, нагруженных всевозможными тропическими фруктами, овощами, орхидеями, банками с пивом.',
-    photos: [10, 11, 12]
+    name: 'Chamonix',
+    pictures: [
+      {
+        src: `${PHOTOS_SRC}10`,
+        description: 'Chamonix photo 1'
+      }, {
+        src: `${PHOTOS_SRC}11`,
+        description: 'Chamonix photo 2'
+      }, {
+        src: `${PHOTOS_SRC}12`,
+        description: 'Chamonix photo 3'
+      }
+    ]
   }
-};
+];
 
 const SORT_EVENTS = {
   Everything: 'Click New Event to create your first point',
@@ -201,11 +241,7 @@ export {
   EVENT_TYPES,
   SORT_EVENTS,
   DEFAULT_FILTER,
-  EDIT_DATE_FORMAT,
   DESTINATIONS,
-  PHOTOS_COUNT,
-  PHOTOS_BORDER_NUMS,
-  PHOTOS_SRC,
   FilterType,
   Mode,
   SortType,

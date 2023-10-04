@@ -1,6 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { OFFERS_KEY_WORDS, DESTINATIONS,
-  PHOTOS_SRC, } from '../const.js';
+import { OFFERS_KEY_WORDS, DESTINATIONS, EVENT_TYPES } from '../const.js';
 import EventHeaderView from './event-header-view.js';
 import { RenderPosition, render } from '../framework/render.js';
 
@@ -44,19 +43,23 @@ function createOfferTemplate(event, isOffers, eventTypes) {
 
 function createPhotos(destination) {
   let photos = '';
-  const destinationPhotos = DESTINATIONS[destination].photos;
+  const destinationPhotos = DESTINATIONS.filter((item) => item.name === destination)[0].pictures;
   destinationPhotos.forEach((photo) => {
-    photos += `<img class="event__photo" src="${PHOTOS_SRC}${photo}" alt="Event photo">\n`;
+    photos += `<img class="event__photo" src="${photo.src}" alt="${photo.description}">\n`;
   });
 
   return photos;
 }
 
 function createDestinationTemplate({ destination, isDestination }) {
+  let currentDestinationInfo;
+  if (isDestination) {
+    currentDestinationInfo = DESTINATIONS.filter((item) => item.name === destination)[0];
+  }
   return (
     isDestination ? `<section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${DESTINATIONS[destination].description}</p>
+      <p class="event__destination-description">${currentDestinationInfo.description}</p>
 
       <div class="event__photos-container">
         <div class="event__photos-tape">
@@ -87,9 +90,13 @@ export default class EventEditView extends AbstractStatefulView {
     super();
     this._eventTypes = eventTypes;
     this._setState(this.parseEventToState(event));
-    this.#header = new EventHeaderView({ event, onRollupClick });
     this.#onSubmitClick = onSubmitClick;
     this.#onCancelClick = onCancelClick;
+    this.#header = new EventHeaderView({
+      event,
+      onRollupClick,
+      onSubmitClick: this.#submitClickHandler});
+
     this._restoreHandlers();
   }
 
@@ -122,9 +129,15 @@ export default class EventEditView extends AbstractStatefulView {
     render(this.#header, this.element, RenderPosition.AFTERBEGIN);
   }
 
-  #submitClickHandler = (evt) => {
-    evt.preventDefault();
-    this.#onSubmitClick(EventEditView.parseStateToEvent(this._state));
+  #submitClickHandler = ({ destination, type, date, startTime, endTime }) => {
+    this.#onSubmitClick(EventEditView.parseStateToEvent({
+      ...this._state,
+      destination,
+      type,
+      date,
+      startTime,
+      endTime
+    }));
   };
 
   #cancelClickHandler = (evt) => {
@@ -133,11 +146,10 @@ export default class EventEditView extends AbstractStatefulView {
   };
 
   #destinationChangeHandler = (evt) => {
-    if (Object.keys(DESTINATIONS).includes(evt.target.value)) {
-      this.updateElement({
-        destination: evt.target.value
-      });
-    }
+    this.updateElement({
+      isDestination: evt.target.value !== '',
+      destination: evt.target.value
+    });
   };
 
   #eventTypeListHandler = (evt) => {
@@ -153,14 +165,20 @@ export default class EventEditView extends AbstractStatefulView {
     if (evt.target.tagName !== 'INPUT') {
       return;
     }
-    const target = evt.target.name.replace('event-offer-', '');
+    const targetWord = evt.target.name.replace('event-offer-', '');
     const isChecked = evt.target.checked;
     const type = this._state.typeAndOffers.type;
     const offers = this._state.typeAndOffers.offers;
+
     if (isChecked) {
-      offers.push(target);
+      const smth = EVENT_TYPES.filter((item) =>
+        item.type === type)[0].offers.filter((offer) =>
+        offer.title.includes(targetWord));
+      offers.push(smth[0]);
     } else {
-      offers.splice(offers.indexOf(target), 1);
+      const targetIndex = offers.findIndex((item) =>
+        item.title.includes(targetWord));
+      offers.splice(targetIndex, 1);
     }
     this.updateElement({
       typeAndOffers: {

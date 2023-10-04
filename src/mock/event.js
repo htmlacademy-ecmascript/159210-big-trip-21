@@ -1,5 +1,5 @@
 import { EVENT_TYPES, DESTINATIONS, MAX_PRICE, MIN_PRICE } from '../const.js';
-import { getRandomInteger, getRandomArrayElement, getRandomBoolean, getRandomKey, formalizeTime } from '../utils/common.js';
+import { getRandomInteger, getRandomArrayElement, getRandomBoolean, formalizeTime } from '../utils/common.js';
 import dayjs from 'dayjs';
 import dayjsRandom from 'dayjs-random';
 import dayOfYear from 'dayjs/plugin/dayOfYear';
@@ -54,7 +54,7 @@ function getNewEvent() {
     id: nanoid(),
     date: newDate.date,
     typeAndOffers: getEventTypeAndOffers(),
-    destination: getRandomKey(DESTINATIONS),
+    destination: getRandomArrayElement(DESTINATIONS).name,
     startTime: newDate.startTime,
     endTime: newDate.endTime,
     price: getRandomInteger(MIN_PRICE, MAX_PRICE),

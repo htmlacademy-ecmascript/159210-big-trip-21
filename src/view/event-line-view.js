@@ -18,7 +18,7 @@ function createOffersList(offers) {
 function createEventTemplate({ date, typeAndOffers, destination, startTime, price, isFav, endTime}) {
   return (
     `<div class="event">
-      <time class="event__date" datetime="2019-03-18">${dayjs(date).format(DATE_FORMAT)}</time>
+      <time class="event__date" datetime="2019-03-18">${dayjs(date).format(DATE_FORMAT.shortFormat)}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${typeAndOffers.type.toLowerCase()}.png" alt="Event type icon">
       </div>

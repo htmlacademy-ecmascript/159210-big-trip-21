@@ -5,9 +5,11 @@ import { sortByDate, sortByDuration, sortByPrice } from '../utils/event.js';
 import EmptyListView from '../view/empty-list-view.js';
 import EventPresenter from './event-presenter.js';
 import { SortType, UpdateType, UserAction, DEFAULT_SORT_TYPE } from '../const.js';
+import { filter } from '../utils/filter.js';
 
 export default class PagePresenter {
   #container = null;
+  #filterModel = null;
   #eventsModel = null;
   #sortComponent = null;
 
@@ -16,24 +18,30 @@ export default class PagePresenter {
   #eventPresenters = new Map();
   #currentSortType = DEFAULT_SORT_TYPE;
 
-  constructor({ container, eventsModel }) {
+  constructor({ container, filterModel, eventsModel }) {
     this.#container = container;
+    this.#filterModel = filterModel;
     this.#eventsModel = eventsModel;
 
     this.#eventsModel.addObserver(this.#onModelEvent);
+    this.#filterModel.addObserver(this.#onModelEvent);
   }
 
   get events() {
+    const filterType = this.#filterModel.filter;
+    const events = this.#eventsModel.events;
+    const filteredEvents = filter[filterType](events);
+
     switch (this.#currentSortType) {
       case SortType.DAY.name:
-        return [...this.#eventsModel.events].sort(sortByDate);
+        return filteredEvents.sort(sortByDate);
 
       case SortType.TIME.name:
-        return [...this.#eventsModel.events].sort(sortByDuration);
+        return filteredEvents.sort(sortByDuration);
 
       case SortType.PRICE.name:
       default:
-        return [...this.#eventsModel.events].sort(sortByPrice);
+        return filteredEvents.sort(sortByPrice);
     }
   }
 

@@ -4,7 +4,7 @@ import { render, remove } from '../framework/render.js';
 import { sortByDate, sortByDuration, sortByPrice } from '../utils/event.js';
 import EmptyListView from '../view/empty-list-view.js';
 import EventPresenter from './event-presenter.js';
-import { SortType, UpdateType, UserAction, DEFAULT_SORT_TYPE } from '../const.js';
+import { SortType, UpdateType, UserAction, DEFAULT_SORT_TYPE, FilterType } from '../const.js';
 import { filter } from '../utils/filter.js';
 
 export default class PagePresenter {
@@ -12,11 +12,12 @@ export default class PagePresenter {
   #filterModel = null;
   #eventsModel = null;
   #sortComponent = null;
+  #emptyEventList = null;
 
   #listComponent = new ListView();
-  #emptyEventList = new EmptyListView();
   #eventPresenters = new Map();
   #currentSortType = DEFAULT_SORT_TYPE;
+  #filterType = FilterType.EVERYTHING;
 
   constructor({ container, filterModel, eventsModel }) {
     this.#container = container;
@@ -28,9 +29,9 @@ export default class PagePresenter {
   }
 
   get events() {
-    const filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filter;
     const events = this.#eventsModel.events;
-    const filteredEvents = filter[filterType](events);
+    const filteredEvents = filter[this.#filterType](events);
 
     switch (this.#currentSortType) {
       case SortType.DAY.name:
@@ -81,6 +82,8 @@ export default class PagePresenter {
   }
 
   #renderEmptyEventList() {
+    this.#emptyEventList = new EmptyListView(this.#filterType);
+
     render(this.#emptyEventList, this.#container);
   }
 

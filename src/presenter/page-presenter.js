@@ -6,6 +6,7 @@ import EmptyListView from '../view/empty-list-view.js';
 import EventPresenter from './event-presenter.js';
 import { SortType, UpdateType, UserAction, DEFAULT_SORT_TYPE, FilterType } from '../const.js';
 import { filter } from '../utils/filter.js';
+import NewEventPresenter from './new-event-presenter.js';
 
 export default class PagePresenter {
   #container = null;
@@ -13,19 +14,26 @@ export default class PagePresenter {
   #eventsModel = null;
   #sortComponent = null;
   #emptyEventList = null;
+  #newEventPresenter = null;
 
   #listComponent = new ListView();
   #eventPresenters = new Map();
   #currentSortType = DEFAULT_SORT_TYPE;
   #filterType = FilterType.EVERYTHING;
 
-  constructor({ container, filterModel, eventsModel }) {
+  constructor({ container, filterModel, eventsModel, onNewEventDestroy }) {
     this.#container = container;
     this.#filterModel = filterModel;
     this.#eventsModel = eventsModel;
 
     this.#eventsModel.addObserver(this.#onModelEvent);
     this.#filterModel.addObserver(this.#onModelEvent);
+
+    this.#newEventPresenter = new NewEventPresenter({
+      eventListContainer: this.#listComponent.element,
+      onDataChange: this.#onViewAction,
+      onDestroy: onNewEventDestroy
+    });
   }
 
   get events() {
@@ -48,6 +56,12 @@ export default class PagePresenter {
 
   init() {
     this.#renderPage();
+  }
+
+  createEvent() {
+    this.#currentSortType = SortType.DEFAULT;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#newEventPresenter.init();
   }
 
   #renderPage() {
@@ -89,6 +103,7 @@ export default class PagePresenter {
 
   #clearPage({resetSortType = false} = {}) {
 
+    this.#newEventPresenter.destroy();
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
 
@@ -142,10 +157,6 @@ export default class PagePresenter {
     this.#currentSortType = sortType;
     this.#clearPage();
     this.#renderPage();
-  };
-
-  #onEventChange = (updatedEvent) => {
-    this.#eventPresenters.get(updatedEvent.id).init(updatedEvent);
   };
 
   #onModeChange = () => {

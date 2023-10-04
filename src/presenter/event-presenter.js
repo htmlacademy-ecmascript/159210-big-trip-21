@@ -2,7 +2,7 @@ import { remove, render, replace } from '../framework/render.js';
 import EventEditView from '../view/event-edit-view.js';
 import EventLineView from '../view/event-line-view.js';
 import ListItemView from '../view/list-item-view.js';
-import { EVENT_TYPES, Mode, UserAction, UpdateType } from '../const.js';
+import { EVENT_TYPES, Mode, UserAction, UpdateType, EDIT_TYPE } from '../const.js';
 import { isSameDate } from '../utils/event.js';
 
 
@@ -17,6 +17,7 @@ export default class EventPresenter {
   #eventContainerComponent = new ListItemView();
   #mode = Mode.DEFAULT;
   _eventTypes = EVENT_TYPES;
+  #editType = EDIT_TYPE.edit.type;
 
   constructor({ eventListComponent, onEventChange, onModeChange }) {
     this.#eventListComponent = eventListComponent;
@@ -39,7 +40,8 @@ export default class EventPresenter {
       onSubmitClick: this.#onSubmitClick,
       onDeleteClick: this.#onDeleteClick,
       onRollupClick: this.#onRollupClick,
-      eventTypes: this._eventTypes
+      eventTypes: this._eventTypes,
+      editType: this.#editType,
     });
 
     this.#eventEditComponent.init();

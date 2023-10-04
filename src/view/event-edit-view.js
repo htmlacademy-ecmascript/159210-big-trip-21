@@ -86,7 +86,7 @@ export default class EventEditView extends AbstractStatefulView {
   #onSubmitClick = null;
   #onDeleteClick = null;
 
-  constructor({ event, onSubmitClick, onDeleteClick, onRollupClick, eventTypes }) {
+  constructor({ event, onSubmitClick, onDeleteClick, onRollupClick, eventTypes, editType }) {
     super();
     this._eventTypes = eventTypes;
     this._setState(this.parseEventToState(event));
@@ -95,7 +95,9 @@ export default class EventEditView extends AbstractStatefulView {
     this.#header = new EventHeaderView({
       event,
       onRollupClick,
-      onSubmitClick: this.#submitClickHandler});
+      onSubmitClick: this.#submitClickHandler,
+      editType
+    });
 
     this._restoreHandlers();
   }
@@ -190,6 +192,7 @@ export default class EventEditView extends AbstractStatefulView {
 
   parseEventToState(event) {
     const type = event.typeAndOffers.type;
+
     return {
       ...event,
       isDestination: event.destination !== null,

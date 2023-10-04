@@ -1,4 +1,4 @@
-import { DESTINATIONS, EVENT_TYPES, DATE_FORMAT } from '../const.js';
+import { DESTINATIONS, EVENT_TYPES, DATE_FORMAT, EDIT_TYPE } from '../const.js';
 import dayjs from 'dayjs';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
@@ -31,13 +31,17 @@ function createDestinationOptions() {
   return optionsList;
 }
 
-function createEventHeaderTemplate({ typeAndOffers, price, destination, startTime, endTime }) {
+function createEventHeaderTemplate({ typeAndOffers, price, destination, startTime, endTime }, editType) {
   return (
     `<header class="event__header">
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="img/icons/${typeAndOffers.type.toLowerCase()}.png" alt="Event type icon">
+          <img
+            class="event__type-icon"
+            width="17" height="17"
+            src="img/icons/${typeAndOffers.type.toLowerCase()}.png"
+            alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -53,7 +57,12 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
         <label class="event__label  event__type-output" for="event-destination-1">
           ${typeAndOffers.type}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
+        <input
+          class="event__input  event__input--destination"
+          id="event-destination-1"
+          type="text"
+          name="event-destination"
+          value="${destination === null ? '' : destination}" list="destination-list-1">
         <datalist id="destination-list-1">
           ${createDestinationOptions()}
         </datalist>
@@ -86,10 +95,10 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Delete</button>
-      <button class="event__rollup-btn" type="button">
+      <button class="event__reset-btn" type="reset">${EDIT_TYPE[editType].text}</button>
+      ${editType === 'edit' ? `<button class="event__rollup-btn" type="button">
                     <span class="visually-hidden">Open event</span>
-                  </button>
+                  </button>` : ''}
     </header>`
   );
 }
@@ -99,18 +108,20 @@ export default class EventHeaderView extends AbstractStatefulView {
   #datePickerFrom = null;
   #datePickerTo = null;
   #onSubmitClick = null;
+  #editType = null;
 
-  constructor({ event, onRollupClick, onSubmitClick }) {
+  constructor({ event, onRollupClick, onSubmitClick, editType }) {
     super();
     this._setState(EventHeaderView.parseHeaderToState(event));
     this.#onRollupClick = onRollupClick;
     this.#onSubmitClick = onSubmitClick;
+    this.#editType = editType;
 
     this._restoreHandlers();
   }
 
   get template() {
-    return createEventHeaderTemplate(this._state);
+    return createEventHeaderTemplate(this._state, this.#editType);
   }
 
   removeElement() {
@@ -130,14 +141,17 @@ export default class EventHeaderView extends AbstractStatefulView {
   _restoreHandlers() {
     this.element.querySelector('.event__save-btn')
       .addEventListener('click', this.#submitClickHandler);
-    this.element.querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#rollupClickHandler);
     this.element.querySelector('.event__type-list')
       .addEventListener('click', this.#eventTypeListHandler);
     this.element.querySelector('.event__input--destination')
       .addEventListener('input', this.#destinationChangeHandler);
     this.element.querySelector('.event__input--price')
       .addEventListener('blur', this.#priceChangeHandler);
+
+    if (this.element.querySelector('.event__rollup-btn')) {
+      this.element.querySelector('.event__rollup-btn')
+        .addEventListener('click', this.#rollupClickHandler);
+    }
 
     this.#setDatePickers();
   }

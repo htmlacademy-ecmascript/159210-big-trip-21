@@ -240,6 +240,29 @@ const UpdateType = {
   MAJOR: 'MAJOR'
 };
 
+const EDIT_TYPE = {
+  edit: {
+    type: 'edit',
+    text: 'Delete'
+  },
+  new: {
+    type: 'new',
+    text: 'Cancel'
+  }
+};
+
+const DEFAULT_EVENT = {
+  date: new Date(),
+  typeAndOffers: {
+    type: EVENT_TYPES[0].type,
+    offers: [] },
+  destination: null,
+  startTime: new Date(),
+  endTime: new Date(),
+  price: 0,
+  isFav: false
+};
+
 export {
   ENTRY_COUNT,
   MAX_TIME,
@@ -257,5 +280,7 @@ export {
   OFFERS_KEY_WORDS,
   UserAction,
   UpdateType,
-  DEFAULT_SORT_TYPE
+  DEFAULT_SORT_TYPE,
+  EDIT_TYPE,
+  DEFAULT_EVENT
 };

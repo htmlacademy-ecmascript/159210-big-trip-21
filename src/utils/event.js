@@ -27,8 +27,8 @@ function isDateInPast(date) {
   return date && dayjs().isAfter(dayjs(date), 'D');
 }
 
-function updateEvent(events, update) {
-  return events.map((event) => event.id === update.id ? update : event);
+function isSameDate(dateA, dateB) {
+  return (dateA === null && dateB === null) || dayjs(dateA).isSame(dayjs(dateB));
 }
 
 function compareNumbers(dataA, dataB) {
@@ -46,5 +46,5 @@ const sortByDuration = (a, b) =>
 
 const sortByPrice = (a, b) => compareNumbers(a.price, b.price);
 
-export { getEventDuration, isDateInFuture, isDateToday, isDateInPast, updateEvent,
-  sortByDate, sortByDuration, sortByPrice };
+export { getEventDuration, isDateInFuture, isDateToday, isDateInPast,
+  sortByDate, sortByDuration, sortByPrice, isSameDate };

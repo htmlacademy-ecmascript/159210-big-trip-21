@@ -2,7 +2,8 @@ import { remove, render, replace } from '../framework/render.js';
 import EventEditView from '../view/event-edit-view.js';
 import EventLineView from '../view/event-line-view.js';
 import ListItemView from '../view/list-item-view.js';
-import { EVENT_TYPES, Mode } from '../const.js';
+import { EVENT_TYPES, Mode, UserAction, UpdateType, EDIT_TYPE } from '../const.js';
+import { isSameDate } from '../utils/event.js';
 
 
 export default class EventPresenter {
@@ -16,6 +17,7 @@ export default class EventPresenter {
   #eventContainerComponent = new ListItemView();
   #mode = Mode.DEFAULT;
   _eventTypes = EVENT_TYPES;
+  #editType = EDIT_TYPE.edit.type;
 
   constructor({ eventListComponent, onEventChange, onModeChange }) {
     this.#eventListComponent = eventListComponent;
@@ -36,9 +38,10 @@ export default class EventPresenter {
     this.#eventEditComponent = new EventEditView({
       event: this.#event,
       onSubmitClick: this.#onSubmitClick,
-      onCancelClick: this.#onCancelClick,
+      onDeleteClick: this.#onDeleteClick,
       onRollupClick: this.#onRollupClick,
-      eventTypes: this._eventTypes
+      eventTypes: this._eventTypes,
+      editType: this.#editType,
     });
 
     this.#eventEditComponent.init();
@@ -85,13 +88,26 @@ export default class EventPresenter {
     this.#replaceLineToForm();
   };
 
-  #onSubmitClick = (event) => {
-    this.#onEventChange(event);
+  #onSubmitClick = (update) => {
+    const isMinorUpdate =
+      !isSameDate(this.#event.startTime, update.startTime) ||
+      !isSameDate(this.#event.endTime, update.endTime) ||
+      this.#event.price !== update.price;
+
+    this.#onEventChange(
+      UserAction.UPDATE_EVENT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update
+    );
     this.#replaceFormToLine();
   };
 
-  #onCancelClick = () => {
-    this.#replaceFormToLine();
+  #onDeleteClick = (event) => {
+    this.#onEventChange(
+      UserAction.DELETE_EVENT,
+      UpdateType.MINOR,
+      event
+    );
   };
 
   #onRollupClick = () => {
@@ -99,7 +115,11 @@ export default class EventPresenter {
   };
 
   #onFavoriteClick = () => {
-    this.#onEventChange({ ...this.#event, isFav: !this.#event.isFav });
+    this.#onEventChange(
+      UserAction.UPDATE_EVENT,
+      UpdateType.MINOR,
+      { ...this.#event, isFav: !this.#event.isFav }
+    );
   };
 
   #replaceLineToForm() {

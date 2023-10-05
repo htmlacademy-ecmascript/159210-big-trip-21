@@ -207,28 +207,60 @@ const SortType = {
   DAY: {
     name: 'day',
     isEnabled: true,
-    isChecked: false
   },
   EVENT: {
     name: 'event',
     isEnabled: false,
-    isChecked: false
   },
   TIME: {
     name: 'time',
     isEnabled: true,
-    isChecked: false
   },
   PRICE: {
     name: 'price',
     isEnabled: true,
-    isChecked: true
   },
   OFFERS: {
     name: 'offers',
     isEnabled: false,
-    isChecked: false
   }
+};
+
+const DEFAULT_SORT_TYPE = SortType.PRICE.name;
+
+const UserAction = {
+  UPDATE_EVENT: 'UPDATE_EVENT',
+  ADD_EVENT: 'ADD_EVENT',
+  DELETE_EVENT: 'DELETE_EVENT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR'
+};
+
+const EDIT_TYPE = {
+  edit: {
+    type: 'edit',
+    text: 'Delete'
+  },
+  new: {
+    type: 'new',
+    text: 'Cancel'
+  }
+};
+
+const DEFAULT_EVENT = {
+  date: new Date(),
+  typeAndOffers: {
+    type: EVENT_TYPES[0].type,
+    offers: [] },
+  destination: null,
+  startTime: new Date(),
+  endTime: new Date(),
+  price: 0,
+  isFav: false
 };
 
 export {
@@ -245,5 +277,10 @@ export {
   FilterType,
   Mode,
   SortType,
-  OFFERS_KEY_WORDS
+  OFFERS_KEY_WORDS,
+  UserAction,
+  UpdateType,
+  DEFAULT_SORT_TYPE,
+  EDIT_TYPE,
+  DEFAULT_EVENT
 };

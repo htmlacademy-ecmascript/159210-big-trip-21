@@ -84,18 +84,20 @@ function createEventEditTemplate(event, isOffers, isDestination, eventTypes) {
 export default class EventEditView extends AbstractStatefulView {
   #header = null;
   #onSubmitClick = null;
-  #onCancelClick = null;
+  #onDeleteClick = null;
 
-  constructor({ event, onSubmitClick, onCancelClick, onRollupClick, eventTypes }) {
+  constructor({ event, onSubmitClick, onDeleteClick, onRollupClick, eventTypes, editType }) {
     super();
     this._eventTypes = eventTypes;
     this._setState(this.parseEventToState(event));
     this.#onSubmitClick = onSubmitClick;
-    this.#onCancelClick = onCancelClick;
+    this.#onDeleteClick = onDeleteClick;
     this.#header = new EventHeaderView({
       event,
       onRollupClick,
-      onSubmitClick: this.#submitClickHandler});
+      onSubmitClick: this.#submitClickHandler,
+      editType
+    });
 
     this._restoreHandlers();
   }
@@ -111,7 +113,7 @@ export default class EventEditView extends AbstractStatefulView {
 
   _restoreHandlers() {
     this.element.addEventListener('submit', this.#submitClickHandler);
-    this.element.addEventListener('reset', this.#cancelClickHandler);
+    this.element.addEventListener('reset', this.#deleteClickHandler);
     this.#header.element.querySelector('.event__input--destination')
       .addEventListener('input', this.#destinationChangeHandler);
     this.#header.element.querySelector('.event__type-list')
@@ -129,20 +131,21 @@ export default class EventEditView extends AbstractStatefulView {
     render(this.#header, this.element, RenderPosition.AFTERBEGIN);
   }
 
-  #submitClickHandler = ({ destination, type, date, startTime, endTime }) => {
+  #submitClickHandler = ({ destination, type, date, startTime, endTime, price }) => {
     this.#onSubmitClick(EventEditView.parseStateToEvent({
       ...this._state,
       destination,
       type,
       date,
       startTime,
-      endTime
+      endTime,
+      price
     }));
   };
 
-  #cancelClickHandler = (evt) => {
+  #deleteClickHandler = (evt) => {
     evt.preventDefault();
-    this.#onCancelClick();
+    this.#onDeleteClick(EventEditView.parseStateToEvent(this._state));
   };
 
   #destinationChangeHandler = (evt) => {
@@ -190,6 +193,7 @@ export default class EventEditView extends AbstractStatefulView {
 
   parseEventToState(event) {
     const type = event.typeAndOffers.type;
+
     return {
       ...event,
       isDestination: event.destination !== null,

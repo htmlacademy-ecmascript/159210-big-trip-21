@@ -69,12 +69,11 @@ export default class PagePresenter {
     render(this.#listComponent, this.#container);
 
     if (this.events.length > 0) {
-      for (let i = 0; i < this.events.length; i++) {
-        this.#renderEvent(this.events[i]);
-      }
-    } else {
-      this.#renderEmptyEventList();
+      this.events.forEach((event) => this.#renderEvent(event));
+      return;
     }
+
+    this.#renderEmptyEventList();
   }
 
   #renderEvent(event) {

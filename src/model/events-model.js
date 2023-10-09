@@ -3,14 +3,16 @@ import Observable from '../framework/observable.js';
 
 export default class EventsModel extends Observable {
   #eventsApiService = null;
+  #destinationsModel = null;
+  #offersModel = null;
 
   #events = [];
-  #destinations = [];
-  #offers = [];
 
-  constructor({ eventsApiService }) {
+  constructor({ eventsApiService, destinationsModel, offersModel }) {
     super();
     this.#eventsApiService = eventsApiService;
+    this.#destinationsModel = destinationsModel;
+    this.#offersModel = offersModel;
   }
 
   get events() {
@@ -19,11 +21,14 @@ export default class EventsModel extends Observable {
 
   async init() {
     try {
-      const events = await this.#eventsApiService.events;
-      this.#destinations = await this.#eventsApiService.destinations;
-      this.#offers = await this.#eventsApiService.offers;
+      await Promise.all([
+        this.#destinationsModel.init(),
+        this.#offersModel.init()
+      ]);
 
-      this.#events = events.map(this.#adaptToClient);
+      const events = await this.#eventsApiService.events;
+
+      this.#events = events.map(this.#adaptToClient.bind(this));
     } catch(err) {
       this.#events = [];
     }
@@ -73,14 +78,19 @@ export default class EventsModel extends Observable {
 
   #adaptToClient(event) {
     //вот здесь я хочу сразу заменить destination id и офферы на человеческие данные,
-    //но при вызове this.#destinations вся функция adaptToClient перестаёт работать
+    //но при вызове this._destinations вся функция adaptToClient перестаёт работать
+
+    const humanizeOffers = (offer) => this.#offersModel
+      .getByType(event.type).offers
+      .find((item) => item.id === offer);
+
     const adaptedEvent = {...event,
       basePrice: event['base_price'],
       dateFrom: event['date_from'] !== null ? new Date(event['date_from']) : event['date_from'],
       dateTo: event['date_to'] !== null ? new Date(event['date_to']) : event['date_to'],
       isFavorite: event['is_favorite'],
-
-      destination: this.#destinations.filter(({id}) => id === event.destination)[0].name
+      destination: this.#destinationsModel.getById(event.destination).name,
+      offers: event.offers.map(humanizeOffers),
     };
 
     delete adaptedEvent['base_price'];

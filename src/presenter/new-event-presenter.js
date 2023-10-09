@@ -1,23 +1,38 @@
 import { nanoid } from 'nanoid';
-import { EDIT_TYPE, UpdateType, UserAction, EVENT_TYPES, DEFAULT_EVENT } from '../const.js';
+import { EDIT_TYPE, UpdateType, UserAction } from '../const.js';
 import EventEditView from '../view/event-edit-view';
 import { RenderPosition, render, remove } from '../framework/render.js';
 
+function getDefaultEvent(offersModel) {
+  const types = offersModel.get();
+  return {
+    type: types[0].type,
+    offers: [],
+    destination: null,
+    dateFrom: new Date(),
+    dateTo: new Date(),
+    basePrice: 0,
+    isFavorite: false
+  };
+}
 
 export default class NewEventPresenter {
   #eventListContainer = null;
   #onDataChange = null;
   #onDestroy = null;
   #eventEditComponent = null;
+  #offersModel = null;
+  #destinationsModel = null;
+  #event = null;
 
   #editType = EDIT_TYPE.new.type;
-  _eventTypes = EVENT_TYPES;
-  #event = DEFAULT_EVENT;
 
-  constructor({ eventListContainer, onDataChange, onDestroy }) {
+  constructor({ eventListContainer, onDataChange, onDestroy, offersModel, destinationsModel }) {
     this.#eventListContainer = eventListContainer;
     this.#onDataChange = onDataChange;
     this.#onDestroy = onDestroy;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
   }
 
   init() {
@@ -25,12 +40,15 @@ export default class NewEventPresenter {
       return;
     }
 
+    this.#event = getDefaultEvent(this.#offersModel);
+
     this.#eventEditComponent = new EventEditView({
       event: this.#event,
       onSubmitClick: this.#onSubmitClick,
       onDeleteClick: this.#onCancelClick,
-      eventTypes: this._eventTypes,
-      editType: this.#editType
+      editType: this.#editType,
+      offersModel: this.#offersModel,
+      destinationsModel: this.#destinationsModel,
     });
 
     render(this.#eventEditComponent, this.#eventListContainer, RenderPosition.AFTERBEGIN);

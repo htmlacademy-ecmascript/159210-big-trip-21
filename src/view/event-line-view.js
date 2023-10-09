@@ -9,16 +9,16 @@ function createOffersList(offers) {
     offersList += `<li class="event__offer">
       <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;
-      <span class="event__offer-price">${offer.basePrice}</span>
+      <span class="event__offer-price">${offer.price}</span>
     </li>`;
   });
   return offersList;
 }
 
-function createEventTemplate({ date, type, offers, destination, dateFrom, basePrice, isFavorite, dateTo }) {
+function createEventTemplate({ type, offers, destination, dateFrom, basePrice, isFavorite, dateTo }) {
   return (
     `<div class="event">
-      <time class="event__date" datetime="2019-03-18">${dayjs(date).format(DATE_FORMAT.shortFormat)}</time>
+      <time class="event__date" datetime="2019-03-18">${dayjs(dateFrom).format(DATE_FORMAT.shortFormat)}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
       </div>

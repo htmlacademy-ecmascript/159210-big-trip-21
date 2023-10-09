@@ -36,15 +36,15 @@ function compareNumbers(dataA, dataB) {
 }
 
 const sortByDate = (a, b) =>
-  compareNumbers(Date.parse(a.date), Date.parse(b.date));
+  compareNumbers(Date.parse(a.dateFrom), Date.parse(b.dateFrom));
 
 const sortByDuration = (a, b) =>
   compareNumbers(
-    dayjs(Date.parse(a.dateTo)).diff(Date.parse(a.dateFrom), 'millisecond'),
-    dayjs(Date.parse(b.dateTo)).diff(Date.parse(b.dateFrom), 'millisecond')
+    dayjs(Date.parse(b.dateTo)).diff(Date.parse(b.dateFrom), 'millisecond'),
+    dayjs(Date.parse(a.dateTo)).diff(Date.parse(a.dateFrom), 'millisecond')
   );
 
-const sortByPrice = (a, b) => compareNumbers(a.basePrice, b.basePrice);
+const sortByPrice = (a, b) => compareNumbers(b.basePrice, a.basePrice);
 
 export { getEventDuration, isDateInFuture, isDateToday, isDateInPast,
   sortByDate, sortByDuration, sortByPrice, isSameDate };

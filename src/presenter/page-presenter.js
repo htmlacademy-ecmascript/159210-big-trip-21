@@ -16,6 +16,8 @@ export default class PagePresenter {
   #sortComponent = null;
   #emptyEventList = null;
   #newEventPresenter = null;
+  #offersModel = null;
+  #destinationsModel = null;
 
   #listComponent = new ListView();
   #eventPresenters = new Map();
@@ -24,10 +26,12 @@ export default class PagePresenter {
   #loadingComponent = new LoadingView();
   #isLoading = true;
 
-  constructor({ container, filterModel, eventsModel, onNewEventDestroy }) {
+  constructor({ container, filterModel, eventsModel, onNewEventDestroy, offersModel, destinationsModel }) {
     this.#container = container;
     this.#filterModel = filterModel;
     this.#eventsModel = eventsModel;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
 
     this.#eventsModel.addObserver(this.#onModelEvent);
     this.#filterModel.addObserver(this.#onModelEvent);
@@ -35,7 +39,9 @@ export default class PagePresenter {
     this.#newEventPresenter = new NewEventPresenter({
       eventListContainer: this.#listComponent.element,
       onDataChange: this.#onViewAction,
-      onDestroy: onNewEventDestroy
+      onDestroy: onNewEventDestroy,
+      offersModel: this.#offersModel,
+      destinationsModel: this.#destinationsModel,
     });
   }
 
@@ -91,7 +97,9 @@ export default class PagePresenter {
     const eventPresenter = new EventPresenter({
       eventListComponent: this.#listComponent.element,
       onEventChange: this.#onViewAction,
-      onModeChange: this.#onModeChange
+      onModeChange: this.#onModeChange,
+      offersModel: this.#offersModel,
+      destinationsModel: this.#destinationsModel,
     });
     eventPresenter.init(event);
     this.#eventPresenters.set(event.id, eventPresenter);

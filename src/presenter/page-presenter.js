@@ -1,12 +1,13 @@
 import SortView from '../view/sort-view.js';
 import ListView from '../view/list-view.js';
-import { render, remove } from '../framework/render.js';
+import { render, remove, RenderPosition } from '../framework/render.js';
 import { sortByDate, sortByDuration, sortByPrice } from '../utils/event.js';
 import EmptyListView from '../view/empty-list-view.js';
 import EventPresenter from './event-presenter.js';
 import { SortType, UpdateType, UserAction, DEFAULT_SORT_TYPE, FilterType } from '../const.js';
 import { filter } from '../utils/filter.js';
 import NewEventPresenter from './new-event-presenter.js';
+import LoadingView from '../view/loading-view.js';
 
 export default class PagePresenter {
   #container = null;
@@ -20,6 +21,8 @@ export default class PagePresenter {
   #eventPresenters = new Map();
   #currentSortType = DEFAULT_SORT_TYPE;
   #filterType = FilterType.EVERYTHING;
+  #loadingComponent = new LoadingView();
+  #isLoading = true;
 
   constructor({ container, filterModel, eventsModel, onNewEventDestroy }) {
     this.#container = container;
@@ -43,13 +46,13 @@ export default class PagePresenter {
 
     switch (this.#currentSortType) {
       case SortType.DAY.name:
+      default:
         return filteredEvents.sort(sortByDate);
 
       case SortType.TIME.name:
         return filteredEvents.sort(sortByDuration);
 
       case SortType.PRICE.name:
-      default:
         return filteredEvents.sort(sortByPrice);
     }
   }
@@ -64,11 +67,19 @@ export default class PagePresenter {
     this.#newEventPresenter.init();
   }
 
+  #renderLoading() {
+    render(this.#loadingComponent, this.#container, RenderPosition.AFTERBEGIN);
+  }
+
   #renderPage() {
-    this.#renderSort();
-    render(this.#listComponent, this.#container);
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
 
     if (this.events.length > 0) {
+      this.#renderSort();
+      render(this.#listComponent, this.#container);
       this.events.forEach((event) => this.#renderEvent(event));
       return;
     }
@@ -143,6 +154,12 @@ export default class PagePresenter {
 
       case UpdateType.MAJOR:
         this.#clearPage({resetSortType: true});
+        this.#renderPage();
+        break;
+
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
         this.#renderPage();
         break;
     }

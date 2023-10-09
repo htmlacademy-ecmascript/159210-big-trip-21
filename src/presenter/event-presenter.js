@@ -90,9 +90,9 @@ export default class EventPresenter {
 
   #onSubmitClick = (update) => {
     const isMinorUpdate =
-      !isSameDate(this.#event.startTime, update.startTime) ||
-      !isSameDate(this.#event.endTime, update.endTime) ||
-      this.#event.price !== update.price;
+      !isSameDate(this.#event.dateFrom, update.dateFrom) ||
+      !isSameDate(this.#event.dateTo, update.dateTo) ||
+      this.#event.basePrice !== update.basePrice;
 
     this.#onEventChange(
       UserAction.UPDATE_EVENT,
@@ -118,7 +118,7 @@ export default class EventPresenter {
     this.#onEventChange(
       UserAction.UPDATE_EVENT,
       UpdateType.MINOR,
-      { ...this.#event, isFav: !this.#event.isFav }
+      { ...this.#event, isFavorite: !this.#event.isFavorite }
     );
   };
 

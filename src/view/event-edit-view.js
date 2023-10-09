@@ -4,14 +4,14 @@ import EventHeaderView from './event-header-view.js';
 import { RenderPosition, render } from '../framework/render.js';
 
 function createOffersList(event, eventTypes) {
-  const eventType = event.typeAndOffers.type;
-  const eventOffers = event.typeAndOffers.offers;
+  const eventType = event.type;
+  const eventOffers = event.offers;
   const offersofType = eventTypes.filter((item) =>
-    item.type === eventType)[0].offers;
+    item.type.toLowerCase() === eventType)[0].offers;
   let offersList = '';
   offersofType.forEach((offer) => {
     const keyWord = OFFERS_KEY_WORDS.filter((word) => offer.title.includes(word));
-    const isChecked = eventOffers.some((item) => item.title.includes(keyWord));
+    const isChecked = eventOffers.some((item) => item.title ? item.title.includes(keyWord) : false);
     offersList += `<div class="event__offer-selector">
           <input
             class="event__offer-checkbox  visually-hidden"
@@ -22,7 +22,7 @@ function createOffersList(event, eventTypes) {
           <label class="event__offer-label" for="event-offer-${keyWord}-1">
             <span class="event__offer-title">${offer.title}</span>
             &plus;&euro;&nbsp;
-            <span class="event__offer-price">${offer.price}</span>
+            <span class="event__offer-price">${offer.basePrice}</span>
           </label>
         </div>`;
   });
@@ -131,15 +131,15 @@ export default class EventEditView extends AbstractStatefulView {
     render(this.#header, this.element, RenderPosition.AFTERBEGIN);
   }
 
-  #submitClickHandler = ({ destination, type, date, startTime, endTime, price }) => {
+  #submitClickHandler = ({ destination, type, date, dateFrom, dateTo, basePrice }) => {
     this.#onSubmitClick(EventEditView.parseStateToEvent({
       ...this._state,
       destination,
       type,
       date,
-      startTime,
-      endTime,
-      price
+      dateFrom,
+      dateTo,
+      basePrice
     }));
   };
 
@@ -157,10 +157,8 @@ export default class EventEditView extends AbstractStatefulView {
 
   #eventTypeListHandler = (evt) => {
     this.updateElement({
-      typeAndOffers: {
-        type: evt.target.innerText,
-        offers: []
-      }
+      type: evt.target.innerText,
+      offers: []
     });
   };
 
@@ -170,8 +168,8 @@ export default class EventEditView extends AbstractStatefulView {
     }
     const targetWord = evt.target.name.replace('event-offer-', '');
     const isChecked = evt.target.checked;
-    const type = this._state.typeAndOffers.type;
-    const offers = this._state.typeAndOffers.offers;
+    const type = this._state.type;
+    const offers = this._state.offers;
 
     if (isChecked) {
       const smth = EVENT_TYPES.filter((item) =>
@@ -184,21 +182,20 @@ export default class EventEditView extends AbstractStatefulView {
       offers.splice(targetIndex, 1);
     }
     this.updateElement({
-      typeAndOffers: {
-        type,
-        offers
-      }
+      type,
+      offers
     });
   };
 
   parseEventToState(event) {
-    const type = event.typeAndOffers.type;
+    const type = event.type;
+    const offers = this._eventTypes.filter((item) =>
+      item.type.toLowerCase() === type)[0].offers;
 
     return {
       ...event,
       isDestination: event.destination !== null,
-      isOffers: this._eventTypes.filter((item) =>
-        item.type === type)[0].offers.length > 0
+      isOffers: offers.length > 0 && event
     };
   }
 

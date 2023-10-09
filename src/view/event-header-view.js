@@ -32,7 +32,7 @@ function createDestinationOptions() {
   return optionsList;
 }
 
-function createEventHeaderTemplate({ typeAndOffers, price, destination, startTime, endTime }, editType) {
+function createEventHeaderTemplate({ type, basePrice, destination, dateFrom, dateTo }, editType) {
   return (
     `<header class="event__header">
       <div class="event__type-wrapper">
@@ -41,7 +41,7 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           <img
             class="event__type-icon"
             width="17" height="17"
-            src="img/icons/${typeAndOffers.type.toLowerCase()}.png"
+            src="img/icons/${type.toLowerCase()}.png"
             alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
@@ -56,7 +56,7 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          ${typeAndOffers.type}
+          ${type}
         </label>
         <input
           class="event__input  event__input--destination"
@@ -76,7 +76,7 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           id="event-start-time-1"
           type="text"
           name="event-start-time"
-          value="${dayjs(startTime).format(DATE_FORMAT.pickerFormat) }">
+          value="${dayjs(dateFrom).format(DATE_FORMAT.pickerFormat) }">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
         <input
@@ -84,13 +84,13 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           id="event-end-time-1"
           type="text"
           name="event-end-time"
-          value="${dayjs(endTime).format(DATE_FORMAT.pickerFormat)}">
+          value="${dayjs(dateTo).format(DATE_FORMAT.pickerFormat)}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
         <label class="event__label" for="event-price-1">
           <span class="visually-hidden">Price</span>
-          &euro;${price}
+          &euro;${basePrice}
         </label>
         <input
           class="event__input  event__input--price"
@@ -173,18 +173,18 @@ export default class EventHeaderView extends AbstractStatefulView {
       dateFromElement,
       {
         ...commonConfig,
-        defaultDate: dayjs(this._state.startTime).format(DATE_FORMAT.editFormat),
+        defaultDate: dayjs(this._state.dateFrom).format(DATE_FORMAT.editFormat),
         onClose: this.#dateFromCloseHandler,
-        maxDate: Date.parse(this._state.endTime),
+        maxDate: Date.parse(this._state.dateTo),
       },
     );
     this.#datePickerTo = flatpickr(
       dateToElement,
       {
         ...commonConfig,
-        defaultDate: dayjs(this._state.endTime).format(DATE_FORMAT.editFormat),
+        defaultDate: dayjs(this._state.dateTo).format(DATE_FORMAT.editFormat),
         onClose: this.#dateToChangeHandler,
-        minDate: Date.parse(this._state.startTime),
+        minDate: Date.parse(this._state.dateFrom),
       },
     );
   }
@@ -192,18 +192,18 @@ export default class EventHeaderView extends AbstractStatefulView {
   #dateFromCloseHandler = ([userDate]) => {
     this._setState({
       ...this._setState,
-      startTime: dayjs(userDate).format(DATE_FORMAT.saveFormat),
+      dateFrom: dayjs(userDate).format(DATE_FORMAT.saveFormat),
       date: dayjs(userDate).format(DATE_FORMAT.dateOnlyFormat)
     });
-    this.#datePickerTo.set('minDate', this._state.startTime);
+    this.#datePickerTo.set('minDate', this._state.dateFrom);
   };
 
   #dateToChangeHandler = ([userDate]) => {
     this._setState({
       ...this._setState,
-      endTime: dayjs(userDate).format(DATE_FORMAT.saveFormat)
+      dateTo: dayjs(userDate).format(DATE_FORMAT.saveFormat)
     });
-    this.#datePickerFrom.set('maxDate', this._state.endTime);
+    this.#datePickerFrom.set('maxDate', this._state.dateTo);
   };
 
   #submitClickHandler = (evt) => {
@@ -220,10 +220,8 @@ export default class EventHeaderView extends AbstractStatefulView {
     evt.preventDefault();
 
     this.updateElement({
-      typeAndOffers: {
-        type: evt.target.innerText,
-        offers: []
-      }
+      type: evt.target.innerText,
+      offers: []
     });
   };
 
@@ -235,7 +233,7 @@ export default class EventHeaderView extends AbstractStatefulView {
 
   #priceChangeHandler = (evt) => {
     this.updateElement({
-      price: he.encode(evt.target.value)
+      basePrice: he.encode(evt.target.value)
     });
   };
 

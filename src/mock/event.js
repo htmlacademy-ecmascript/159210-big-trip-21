@@ -50,15 +50,17 @@ function getEventTypeAndOffers() {
 
 function getNewEvent() {
   const newDate = getDateTime();
+  const typeAndOffers = getEventTypeAndOffers();
   return {
     id: nanoid(),
     date: newDate.date,
-    typeAndOffers: getEventTypeAndOffers(),
+    type: typeAndOffers.type,
+    offers: typeAndOffers.offers,
     destination: getRandomArrayElement(DESTINATIONS).name,
-    startTime: newDate.startTime,
-    endTime: newDate.endTime,
-    price: getRandomInteger(MIN_PRICE, MAX_PRICE),
-    isFav: getRandomBoolean()
+    dateFrom: newDate.startTime,
+    dateTo: newDate.endTime,
+    basePrice: getRandomInteger(MIN_PRICE, MAX_PRICE),
+    isFavorite: getRandomBoolean()
   };
 }
 

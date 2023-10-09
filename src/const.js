@@ -226,7 +226,7 @@ const SortType = {
   }
 };
 
-const DEFAULT_SORT_TYPE = SortType.PRICE.name;
+const DEFAULT_SORT_TYPE = SortType.DAY.name;
 
 const UserAction = {
   UPDATE_EVENT: 'UPDATE_EVENT',
@@ -237,7 +237,8 @@ const UserAction = {
 const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
-  MAJOR: 'MAJOR'
+  MAJOR: 'MAJOR',
+  INIT: 'INIT'
 };
 
 const EDIT_TYPE = {
@@ -252,15 +253,13 @@ const EDIT_TYPE = {
 };
 
 const DEFAULT_EVENT = {
-  date: new Date(),
-  typeAndOffers: {
-    type: EVENT_TYPES[0].type,
-    offers: [] },
+  type: EVENT_TYPES[0].type,
+  offers: [],
   destination: null,
-  startTime: new Date(),
-  endTime: new Date(),
-  price: 0,
-  isFav: false
+  dateFrom: new Date(),
+  dateTo: new Date(),
+  basePrice: 0,
+  isFavorite: false
 };
 
 export {

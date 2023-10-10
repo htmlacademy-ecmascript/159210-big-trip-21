@@ -168,12 +168,18 @@ export default class EventEditView extends AbstractStatefulView {
   };
 
   #offersListChangeHandler = (evt) => {
-    if (!evt.target.closest('.event__offer-selector')) {
+    evt.preventDefault();
+
+    let item = evt.target;
+
+    if (item.nodeName !== 'LABEL' && item.nodeName !== 'SPAN') {
       return;
     }
 
-    evt.preventDefault();
-    const item = evt.target.closest('.event__offer-selector');
+    do {
+      item = item.parentNode;
+    } while (item.className !== 'event__offer-selector');
+
     const itemInput = item.querySelector('input');
     const itemTitle = item.querySelector('.event__offer-title').innerText;
     const isChecked = !itemInput.checked;

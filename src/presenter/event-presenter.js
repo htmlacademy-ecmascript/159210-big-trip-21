@@ -2,7 +2,7 @@ import { remove, render, replace } from '../framework/render.js';
 import EventEditView from '../view/event-edit-view.js';
 import EventLineView from '../view/event-line-view.js';
 import ListItemView from '../view/list-item-view.js';
-import { EVENT_TYPES, Mode, UserAction, UpdateType, EDIT_TYPE } from '../const.js';
+import { Mode, UserAction, UpdateType, EDIT_TYPE } from '../const.js';
 import { isSameDate } from '../utils/event.js';
 
 
@@ -13,16 +13,19 @@ export default class EventPresenter {
   #event = null;
   #onEventChange = null;
   #onModeChange = null;
+  #offersModel = null;
+  #destinationsModel = null;
 
   #eventContainerComponent = new ListItemView();
   #mode = Mode.DEFAULT;
-  _eventTypes = EVENT_TYPES;
   #editType = EDIT_TYPE.edit.type;
 
-  constructor({ eventListComponent, onEventChange, onModeChange }) {
+  constructor({ eventListComponent, onEventChange, onModeChange, offersModel, destinationsModel }) {
     this.#eventListComponent = eventListComponent;
     this.#onEventChange = onEventChange;
     this.#onModeChange = onModeChange;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
   }
 
   init(event) {
@@ -40,8 +43,9 @@ export default class EventPresenter {
       onSubmitClick: this.#onSubmitClick,
       onDeleteClick: this.#onDeleteClick,
       onRollupClick: this.#onRollupClick,
-      eventTypes: this._eventTypes,
       editType: this.#editType,
+      offersModel: this.#offersModel,
+      destinationsModel: this.#destinationsModel,
     });
 
     this.#eventEditComponent.init();
@@ -90,9 +94,9 @@ export default class EventPresenter {
 
   #onSubmitClick = (update) => {
     const isMinorUpdate =
-      !isSameDate(this.#event.startTime, update.startTime) ||
-      !isSameDate(this.#event.endTime, update.endTime) ||
-      this.#event.price !== update.price;
+      !isSameDate(this.#event.dateFrom, update.dateFrom) ||
+      !isSameDate(this.#event.dateTo, update.dateTo) ||
+      this.#event.basePrice !== update.basePrice;
 
     this.#onEventChange(
       UserAction.UPDATE_EVENT,
@@ -118,7 +122,7 @@ export default class EventPresenter {
     this.#onEventChange(
       UserAction.UPDATE_EVENT,
       UpdateType.MINOR,
-      { ...this.#event, isFav: !this.#event.isFav }
+      { ...this.#event, isFavorite: !this.#event.isFavorite }
     );
   };
 

@@ -1,7 +1,6 @@
 import AbstractView from '../framework/view/abstract-view';
 
-function createFilterItem(filter, currentFilter) {
-  const {type} = filter;
+function createFilterItem(type, currentFilter) {
 
   return (`<div class="trip-filters__filter">
         <input
@@ -19,7 +18,7 @@ function createFilterItem(filter, currentFilter) {
 
 function createFilterTemplate(filters, currentFilter) {
   const filterItemsTemplate = filters
-    .map((filter) => createFilterItem(filter, currentFilter))
+    .map((filter) => createFilterItem(filter.type, currentFilter))
     .join('');
 
   return (

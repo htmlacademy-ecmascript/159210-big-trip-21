@@ -1,12 +1,13 @@
 import SortView from '../view/sort-view.js';
 import ListView from '../view/list-view.js';
-import { render, remove } from '../framework/render.js';
+import { render, remove, RenderPosition } from '../framework/render.js';
 import { sortByDate, sortByDuration, sortByPrice } from '../utils/event.js';
 import EmptyListView from '../view/empty-list-view.js';
 import EventPresenter from './event-presenter.js';
 import { SortType, UpdateType, UserAction, DEFAULT_SORT_TYPE, FilterType } from '../const.js';
 import { filter } from '../utils/filter.js';
 import NewEventPresenter from './new-event-presenter.js';
+import LoadingView from '../view/loading-view.js';
 
 export default class PagePresenter {
   #container = null;
@@ -15,16 +16,22 @@ export default class PagePresenter {
   #sortComponent = null;
   #emptyEventList = null;
   #newEventPresenter = null;
+  #offersModel = null;
+  #destinationsModel = null;
 
   #listComponent = new ListView();
   #eventPresenters = new Map();
   #currentSortType = DEFAULT_SORT_TYPE;
   #filterType = FilterType.EVERYTHING;
+  #loadingComponent = new LoadingView();
+  #isLoading = true;
 
-  constructor({ container, filterModel, eventsModel, onNewEventDestroy }) {
+  constructor({ container, filterModel, eventsModel, onNewEventDestroy, offersModel, destinationsModel }) {
     this.#container = container;
     this.#filterModel = filterModel;
     this.#eventsModel = eventsModel;
+    this.#offersModel = offersModel;
+    this.#destinationsModel = destinationsModel;
 
     this.#eventsModel.addObserver(this.#onModelEvent);
     this.#filterModel.addObserver(this.#onModelEvent);
@@ -32,7 +39,9 @@ export default class PagePresenter {
     this.#newEventPresenter = new NewEventPresenter({
       eventListContainer: this.#listComponent.element,
       onDataChange: this.#onViewAction,
-      onDestroy: onNewEventDestroy
+      onDestroy: onNewEventDestroy,
+      offersModel: this.#offersModel,
+      destinationsModel: this.#destinationsModel,
     });
   }
 
@@ -43,13 +52,13 @@ export default class PagePresenter {
 
     switch (this.#currentSortType) {
       case SortType.DAY.name:
+      default:
         return filteredEvents.sort(sortByDate);
 
       case SortType.TIME.name:
         return filteredEvents.sort(sortByDuration);
 
       case SortType.PRICE.name:
-      default:
         return filteredEvents.sort(sortByPrice);
     }
   }
@@ -64,24 +73,33 @@ export default class PagePresenter {
     this.#newEventPresenter.init();
   }
 
+  #renderLoading() {
+    render(this.#loadingComponent, this.#container, RenderPosition.AFTERBEGIN);
+  }
+
   #renderPage() {
-    this.#renderSort();
-    render(this.#listComponent, this.#container);
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
 
     if (this.events.length > 0) {
-      for (let i = 0; i < this.events.length; i++) {
-        this.#renderEvent(this.events[i]);
-      }
-    } else {
-      this.#renderEmptyEventList();
+      this.#renderSort();
+      render(this.#listComponent, this.#container);
+      this.events.forEach((event) => this.#renderEvent(event));
+      return;
     }
+
+    this.#renderEmptyEventList();
   }
 
   #renderEvent(event) {
     const eventPresenter = new EventPresenter({
       eventListComponent: this.#listComponent.element,
       onEventChange: this.#onViewAction,
-      onModeChange: this.#onModeChange
+      onModeChange: this.#onModeChange,
+      offersModel: this.#offersModel,
+      destinationsModel: this.#destinationsModel,
     });
     eventPresenter.init(event);
     this.#eventPresenters.set(event.id, eventPresenter);
@@ -144,6 +162,12 @@ export default class PagePresenter {
 
       case UpdateType.MAJOR:
         this.#clearPage({resetSortType: true});
+        this.#renderPage();
+        break;
+
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
         this.#renderPage();
         break;
     }

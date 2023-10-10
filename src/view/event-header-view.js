@@ -1,38 +1,39 @@
-import { DESTINATIONS, EVENT_TYPES, DATE_FORMAT, EDIT_TYPE } from '../const.js';
+import { DATE_FORMAT, EDIT_TYPE } from '../const.js';
 import dayjs from 'dayjs';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
 import he from 'he';
+import { capitalizeFirstLetter } from '../utils/event.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
-function createEventTypeItems () {
+function createEventTypeItems(allOffers) {
   let itemsList = '';
-  EVENT_TYPES.forEach((eventType) => {
+  allOffers.forEach((eventType, index) => {
     itemsList += `<div class="event__type-item">
               <input
-                id="event-type-${eventType.type.toLowerCase()}-1"
+                id="event-type-${eventType.type}-${index}"
                 class="event__type-input  visually-hidden"
                 type="radio"
                 name="event-type"
-                value="${eventType.type.toLowerCase()}">
+                value="${eventType.type}">
               <label
-                class="event__type-label  event__type-label--${eventType.type.toLowerCase()}"
-                for="event-type-${eventType.type.toLowerCase()}-1">${eventType.type}</label>
+                class="event__type-label  event__type-label--${eventType.type}"
+                for="event-type-${eventType.type}-${index}">${capitalizeFirstLetter(eventType.type)}</label>
             </div>`;
   });
   return itemsList;
 }
 
-function createDestinationOptions() {
+function createDestinationOptions(allDestinations) {
   let optionsList = '';
-  DESTINATIONS.forEach((item) => {
+  allDestinations.forEach((item) => {
     optionsList += `<option value="${item.name}"></option>`;
   });
   return optionsList;
 }
 
-function createEventHeaderTemplate({ typeAndOffers, price, destination, startTime, endTime }, editType) {
+function createEventHeaderTemplate({ type, basePrice, destination, dateFrom, dateTo }, editType, allDestinations, allOffers) {
   return (
     `<header class="event__header">
       <div class="event__type-wrapper">
@@ -41,7 +42,7 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           <img
             class="event__type-icon"
             width="17" height="17"
-            src="img/icons/${typeAndOffers.type.toLowerCase()}.png"
+            src="img/icons/${type.toLowerCase()}.png"
             alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
@@ -49,14 +50,14 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
         <div class="event__type-list">
           <fieldset class="event__type-group">
             <legend class="visually-hidden">Event type</legend>
-            ${createEventTypeItems()}
+            ${createEventTypeItems(allOffers)}
           </fieldset>
         </div>
       </div>
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          ${typeAndOffers.type}
+          ${type}
         </label>
         <input
           class="event__input  event__input--destination"
@@ -65,7 +66,7 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           name="event-destination"
           value="${destination === null ? '' : he.encode(destination)}" list="destination-list-1">
         <datalist id="destination-list-1">
-          ${createDestinationOptions()}
+          ${createDestinationOptions(allDestinations)}
         </datalist>
       </div>
 
@@ -76,7 +77,7 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           id="event-start-time-1"
           type="text"
           name="event-start-time"
-          value="${dayjs(startTime).format(DATE_FORMAT.pickerFormat) }">
+          value="${dayjs(dateFrom).format(DATE_FORMAT.pickerFormat) }">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
         <input
@@ -84,13 +85,13 @@ function createEventHeaderTemplate({ typeAndOffers, price, destination, startTim
           id="event-end-time-1"
           type="text"
           name="event-end-time"
-          value="${dayjs(endTime).format(DATE_FORMAT.pickerFormat)}">
+          value="${dayjs(dateTo).format(DATE_FORMAT.pickerFormat)}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
         <label class="event__label" for="event-price-1">
           <span class="visually-hidden">Price</span>
-          &euro;${price}
+          &euro;${basePrice}
         </label>
         <input
           class="event__input  event__input--price"
@@ -112,19 +113,23 @@ export default class EventHeaderView extends AbstractStatefulView {
   #datePickerTo = null;
   #onSubmitClick = null;
   #editType = null;
+  #allDestinations = null;
+  #allOffers = null;
 
-  constructor({ event, onRollupClick, onSubmitClick, editType }) {
+  constructor({ event, onRollupClick, onSubmitClick, editType, allDestinations, allOffers }) {
     super();
     this._setState(EventHeaderView.parseHeaderToState(event));
     this.#onRollupClick = onRollupClick;
     this.#onSubmitClick = onSubmitClick;
     this.#editType = editType;
+    this.#allDestinations = allDestinations;
+    this.#allOffers = allOffers;
 
     this._restoreHandlers();
   }
 
   get template() {
-    return createEventHeaderTemplate(this._state, this.#editType);
+    return createEventHeaderTemplate(this._state, this.#editType, this.#allDestinations, this.#allOffers);
   }
 
   removeElement() {
@@ -173,18 +178,18 @@ export default class EventHeaderView extends AbstractStatefulView {
       dateFromElement,
       {
         ...commonConfig,
-        defaultDate: dayjs(this._state.startTime).format(DATE_FORMAT.editFormat),
+        defaultDate: dayjs(this._state.dateFrom).format(DATE_FORMAT.editFormat),
         onClose: this.#dateFromCloseHandler,
-        maxDate: Date.parse(this._state.endTime),
+        maxDate: Date.parse(this._state.dateTo),
       },
     );
     this.#datePickerTo = flatpickr(
       dateToElement,
       {
         ...commonConfig,
-        defaultDate: dayjs(this._state.endTime).format(DATE_FORMAT.editFormat),
+        defaultDate: dayjs(this._state.dateTo).format(DATE_FORMAT.editFormat),
         onClose: this.#dateToChangeHandler,
-        minDate: Date.parse(this._state.startTime),
+        minDate: Date.parse(this._state.dateFrom),
       },
     );
   }
@@ -192,18 +197,18 @@ export default class EventHeaderView extends AbstractStatefulView {
   #dateFromCloseHandler = ([userDate]) => {
     this._setState({
       ...this._setState,
-      startTime: dayjs(userDate).format(DATE_FORMAT.saveFormat),
+      dateFrom: dayjs(userDate).format(DATE_FORMAT.saveFormat),
       date: dayjs(userDate).format(DATE_FORMAT.dateOnlyFormat)
     });
-    this.#datePickerTo.set('minDate', this._state.startTime);
+    this.#datePickerTo.set('minDate', this._state.dateFrom);
   };
 
   #dateToChangeHandler = ([userDate]) => {
     this._setState({
       ...this._setState,
-      endTime: dayjs(userDate).format(DATE_FORMAT.saveFormat)
+      dateTo: dayjs(userDate).format(DATE_FORMAT.saveFormat)
     });
-    this.#datePickerFrom.set('maxDate', this._state.endTime);
+    this.#datePickerFrom.set('maxDate', this._state.dateTo);
   };
 
   #submitClickHandler = (evt) => {
@@ -220,10 +225,8 @@ export default class EventHeaderView extends AbstractStatefulView {
     evt.preventDefault();
 
     this.updateElement({
-      typeAndOffers: {
-        type: evt.target.innerText,
-        offers: []
-      }
+      type: evt.target.innerText,
+      offers: []
     });
   };
 
@@ -235,7 +238,7 @@ export default class EventHeaderView extends AbstractStatefulView {
 
   #priceChangeHandler = (evt) => {
     this.updateElement({
-      price: he.encode(evt.target.value)
+      basePrice: he.encode(evt.target.value)
     });
   };
 

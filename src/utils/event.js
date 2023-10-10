@@ -1,8 +1,8 @@
 import dayjs from 'dayjs';
 import { MAX_TIME } from '../const.js';
 
-function getEventDuration(startTime, endTime) {
-  let fullTime = -dayjs(Date.parse(startTime)).diff(Date.parse(endTime), 'minute');
+function getEventDuration(dateFrom, dateTo) {
+  let fullTime = -dayjs(Date.parse(dateFrom)).diff(Date.parse(dateTo), 'minute');
 
   const minutes = fullTime % MAX_TIME.MINUTES;
   fullTime = (fullTime - minutes) / MAX_TIME.MINUTES;
@@ -10,9 +10,9 @@ function getEventDuration(startTime, endTime) {
   const hours = fullTime % MAX_TIME.HOURS;
   fullTime = (fullTime - hours) / MAX_TIME.HOURS;
 
-  const days = fullTime;
+  const days = `${fullTime}D`;
 
-  return `${days}D ${hours}H ${minutes}M`;
+  return `${fullTime > 0 ? days : ''} ${hours}H ${minutes}M`;
 }
 
 function isDateInFuture(date) {
@@ -36,15 +36,26 @@ function compareNumbers(dataA, dataB) {
 }
 
 const sortByDate = (a, b) =>
-  compareNumbers(Date.parse(a.date), Date.parse(b.date));
+  compareNumbers(Date.parse(a.dateFrom), Date.parse(b.dateFrom));
 
 const sortByDuration = (a, b) =>
   compareNumbers(
-    dayjs(Date.parse(a.endTime)).diff(Date.parse(a.startTime), 'millisecond'),
-    dayjs(Date.parse(b.endTime)).diff(Date.parse(b.startTime), 'millisecond')
+    dayjs(Date.parse(b.dateTo)).diff(Date.parse(b.dateFrom), 'millisecond'),
+    dayjs(Date.parse(a.dateTo)).diff(Date.parse(a.dateFrom), 'millisecond')
   );
 
-const sortByPrice = (a, b) => compareNumbers(a.price, b.price);
+const sortByPrice = (a, b) => compareNumbers(b.basePrice, a.basePrice);
+
+const humanizeOffers = (offer, event, offersModel) =>
+  offersModel
+    .getByType(event.type).offers
+    .find((item) => item.id === offer);
+
+function capitalizeFirstLetter(string) {
+  return (string[0].toUpperCase() +
+    string.slice(1));
+}
 
 export { getEventDuration, isDateInFuture, isDateToday, isDateInPast,
-  sortByDate, sortByDuration, sortByPrice, isSameDate };
+  sortByDate, sortByDuration, sortByPrice, isSameDate, humanizeOffers,
+  capitalizeFirstLetter };

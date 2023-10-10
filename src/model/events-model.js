@@ -1,5 +1,6 @@
 import { UpdateType } from '../const.js';
 import Observable from '../framework/observable.js';
+import { humanizeOffers } from '../utils/event.js';
 
 export default class EventsModel extends Observable {
   #eventsApiService = null;
@@ -21,10 +22,8 @@ export default class EventsModel extends Observable {
 
   async init() {
     try {
-      await Promise.all([
-        this.#destinationsModel.init(),
-        this.#offersModel.init()
-      ]);
+      await this.#destinationsModel.init();
+      await this.#offersModel.init();
 
       const events = await this.#eventsApiService.events;
 
@@ -77,20 +76,13 @@ export default class EventsModel extends Observable {
   }
 
   #adaptToClient(event) {
-    //вот здесь я хочу сразу заменить destination id и офферы на человеческие данные,
-    //но при вызове this._destinations вся функция adaptToClient перестаёт работать
-
-    const humanizeOffers = (offer) => this.#offersModel
-      .getByType(event.type).offers
-      .find((item) => item.id === offer);
-
     const adaptedEvent = {...event,
       basePrice: event['base_price'],
       dateFrom: event['date_from'] !== null ? new Date(event['date_from']) : event['date_from'],
       dateTo: event['date_to'] !== null ? new Date(event['date_to']) : event['date_to'],
       isFavorite: event['is_favorite'],
       destination: this.#destinationsModel.getById(event.destination).name,
-      offers: event.offers.map(humanizeOffers),
+      offers: event.offers.map((offer) => humanizeOffers(offer, event, this.#offersModel)),
     };
 
     delete adaptedEvent['base_price'];

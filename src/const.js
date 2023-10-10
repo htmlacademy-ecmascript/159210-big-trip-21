@@ -31,6 +31,7 @@ const FilterType = {
 const Mode = {
   DEFAULT: 'DEFAULT',
   EDITING: 'EDITING',
+  CREATING: 'CREATING',
 };
 
 const SortType = {
@@ -71,15 +72,14 @@ const UpdateType = {
   INIT: 'INIT'
 };
 
-const EDIT_TYPE = {
-  edit: {
-    type: 'edit',
-    text: 'Delete'
-  },
-  new: {
-    type: 'new',
-    text: 'Cancel'
-  }
+const TimeLimit = {
+  LOWER_LIMIT: 0,
+  UPPER_LIMIT: 500
+};
+
+const EditType = {
+  CREATING: 'CREATING',
+  EDITING: 'EDITING'
 };
 
 export {
@@ -93,5 +93,6 @@ export {
   UserAction,
   UpdateType,
   DEFAULT_SORT_TYPE,
-  EDIT_TYPE,
+  TimeLimit,
+  EditType
 };

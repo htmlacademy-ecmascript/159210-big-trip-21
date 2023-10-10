@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createNoTaskTemplate() {
+function createNoEventTemplate() {
   return (
     `<section class="trip-events">
           <h2 class="visually-hidden">Trip events</h2>
@@ -12,6 +12,6 @@ function createNoTaskTemplate() {
 
 export default class LoadingView extends AbstractView {
   get template() {
-    return createNoTaskTemplate();
+    return createNoEventTemplate();
   }
 }

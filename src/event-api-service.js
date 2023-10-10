@@ -40,7 +40,7 @@ export default class EventsApiService extends ApiService {
     const response = await this._load({
       url: 'points',
       method: Method.POST,
-      body: JSON.stringify(event),
+      body: JSON.stringify(this.#adaptToServer(event)),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     });
 
@@ -58,10 +58,15 @@ export default class EventsApiService extends ApiService {
 
   #adaptToServer(event) {
     const adaptedEvent = {...event,
-      'base_price': event.basePrice,
-      'date_from': event.dateFrom instanceof Date ? event.dateFrom.toISOString() : null,
-      'date_to': event.dateTo instanceof Date ? event.dateTo.toISOString() : null,
-      'is_favorite': event.isFavorite
+      ['base_price']: event.basePrice,
+      ['date_from']: event.dateFrom instanceof Date ? event.dateFrom.toISOString() : null,
+      ['date_to']: event.dateTo instanceof Date ? event.dateTo.toISOString() : null,
+      ['is_favorite']: event.isFavorite,
+      destination: this.destinations.find((destination) => destination.name === event.destination).id,
+      // offers: event.offers.forEach((title) =>
+      //   this.offers.find((entry) =>
+      //     entry.type === event.type).offers.find((offer) =>
+      //     offer.title === title).id),
     };
 
     delete adaptedEvent.basePrice;

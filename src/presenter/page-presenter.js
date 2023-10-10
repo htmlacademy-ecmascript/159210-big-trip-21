@@ -4,10 +4,11 @@ import { render, remove, RenderPosition } from '../framework/render.js';
 import { sortByDate, sortByDuration, sortByPrice } from '../utils/event.js';
 import EmptyListView from '../view/empty-list-view.js';
 import EventPresenter from './event-presenter.js';
-import { SortType, UpdateType, UserAction, DEFAULT_SORT_TYPE, FilterType } from '../const.js';
+import { SortType, UpdateType, UserAction, DEFAULT_SORT_TYPE, FilterType, TimeLimit } from '../const.js';
 import { filter } from '../utils/filter.js';
 import NewEventPresenter from './new-event-presenter.js';
 import LoadingView from '../view/loading-view.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 export default class PagePresenter {
   #container = null;
@@ -25,6 +26,10 @@ export default class PagePresenter {
   #filterType = FilterType.EVERYTHING;
   #loadingComponent = new LoadingView();
   #isLoading = true;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   constructor({ container, filterModel, eventsModel, onNewEventDestroy, offersModel, destinationsModel }) {
     this.#container = container;
@@ -127,26 +132,47 @@ export default class PagePresenter {
 
     remove(this.#sortComponent);
     remove(this.#emptyEventList);
+    remove(this.#loadingComponent);
 
     if (resetSortType) {
       this.#currentSortType = DEFAULT_SORT_TYPE;
     }
   }
 
-  #onViewAction = (actionType, updateType, update) => {
+  #onViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
-        this.#eventsModel.updateEvent(updateType,update);
+        this.#eventPresenters.get(update.id).setSaving();
+        try {
+          await this.#eventsModel.updateEvent(updateType, update);
+        } catch (err) {
+          throw new Error(err);
+          // this.#eventPresenters.get(update.id).setAborting();
+        }
         break;
 
       case UserAction.ADD_EVENT:
-        this.#eventsModel.addEvent(updateType, update);
+        this.#newEventPresenter.setSaving();
+        try {
+          await this.#eventsModel.addEvent(updateType, update);
+        } catch (err) {
+          throw new Error(err);
+          // this.#newEventPresenter.setAborting();
+        }
         break;
 
       case UserAction.DELETE_EVENT:
-        this.#eventsModel.deleteEvent(updateType, update);
+        this.#eventPresenters.get(update.id).setDeleting();
+        try {
+          await this.#eventsModel.deleteEvent(updateType, update);
+        } catch (err) {
+          throw new Error(err);
+          // this.#eventPresenters.get(update.id).setAborting();
+        }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #onModelEvent = (updateType, data) => {

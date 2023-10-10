@@ -1,5 +1,4 @@
-import { nanoid } from 'nanoid';
-import { EDIT_TYPE, UpdateType, UserAction } from '../const.js';
+import { EditType, Mode, UpdateType, UserAction } from '../const.js';
 import EventEditView from '../view/event-edit-view';
 import { RenderPosition, render, remove } from '../framework/render.js';
 
@@ -25,7 +24,8 @@ export default class NewEventPresenter {
   #destinationsModel = null;
   #event = null;
 
-  #editType = EDIT_TYPE.new.type;
+  #editType = EditType.CREATING;
+  #mode = Mode.CREATING;
 
   constructor({ eventListContainer, onDataChange, onDestroy, offersModel, destinationsModel }) {
     this.#eventListContainer = eventListContainer;
@@ -67,7 +67,7 @@ export default class NewEventPresenter {
     this.#onDataChange(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
-      {id: nanoid(), ...event}
+      event
     );
     this.destroy();
   };
@@ -88,4 +88,31 @@ export default class NewEventPresenter {
 
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
+
+  setSaving = () => {
+    if (this.#mode === Mode.EDITING) {
+      this.#eventEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true
+      });
+    }
+  };
+
+  setAborting = () => {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#eventEditComponent.shake();
+    }
+
+    if (this.#mode === Mode.EDITING) {
+      const resetFormState = () => {
+        this.#eventEditComponent.updateElement({
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false
+        });
+      };
+
+      this.#eventEditComponent.shake(resetFormState);
+    }
+  };
 }

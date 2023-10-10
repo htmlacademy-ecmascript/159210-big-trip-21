@@ -46,5 +46,16 @@ const sortByDuration = (a, b) =>
 
 const sortByPrice = (a, b) => compareNumbers(b.basePrice, a.basePrice);
 
+const humanizeOffers = (offer, event, offersModel) =>
+  offersModel
+    .getByType(event.type).offers
+    .find((item) => item.id === offer);
+
+function capitalizeFirstLetter(string) {
+  return (string[0].toUpperCase() +
+    string.slice(1));
+}
+
 export { getEventDuration, isDateInFuture, isDateToday, isDateInPast,
-  sortByDate, sortByDuration, sortByPrice, isSameDate };
+  sortByDate, sortByDuration, sortByPrice, isSameDate, humanizeOffers,
+  capitalizeFirstLetter };

@@ -3,13 +3,9 @@ import dayjs from 'dayjs';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
 import he from 'he';
+import { capitalizeFirstLetter } from '../utils/event.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
-
-function capitalizeFirstLetter(string) {
-  return(string[0].toUpperCase() +
-    string.slice(1));
-}
 
 function createEventTypeItems(allOffers) {
   let itemsList = '';

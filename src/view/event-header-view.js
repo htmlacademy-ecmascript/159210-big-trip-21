@@ -238,7 +238,7 @@ export default class EventHeaderView extends AbstractStatefulView {
   #dateToChangeHandler = ([userDate]) => {
     this._setState({
       ...this._setState,
-      dateTo: dayjs(userDate).format(DATE_FORMAT.saveFormat)
+      dateTo: new Date(userDate)
     });
     this.#datePickerFrom.set('maxDate', this._state.dateTo);
   };
@@ -270,7 +270,7 @@ export default class EventHeaderView extends AbstractStatefulView {
 
   #priceChangeHandler = (evt) => {
     this.updateElement({
-      basePrice: he.encode(evt.target.value)
+      basePrice: Number(evt.target.value)
     });
   };
 

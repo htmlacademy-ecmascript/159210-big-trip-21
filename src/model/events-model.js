@@ -24,6 +24,8 @@ export default class EventsModel extends Observable {
     try {
       await this.#destinationsModel.init();
       await this.#offersModel.init();
+      await this.#eventsApiService.getDestinations();
+      await this.#eventsApiService.getOffers();
 
       const events = await this.#eventsApiService.events;
 

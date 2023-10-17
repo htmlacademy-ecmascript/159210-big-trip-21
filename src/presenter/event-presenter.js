@@ -2,7 +2,7 @@ import { remove, render, replace } from '../framework/render.js';
 import EventEditView from '../view/event-edit-view.js';
 import EventLineView from '../view/event-line-view.js';
 import ListItemView from '../view/list-item-view.js';
-import { Mode, UserAction, UpdateType, EDIT_TYPE } from '../const.js';
+import { Mode, UserAction, UpdateType, EditType } from '../const.js';
 import { isSameDate } from '../utils/event.js';
 
 
@@ -18,7 +18,7 @@ export default class EventPresenter {
 
   #eventContainerComponent = new ListItemView();
   #mode = Mode.DEFAULT;
-  #editType = EDIT_TYPE.edit.type;
+  #editType = EditType.EDITING;
 
   constructor({ eventListComponent, onEventChange, onModeChange, offersModel, destinationsModel }) {
     this.#eventListComponent = eventListComponent;
@@ -87,6 +87,40 @@ export default class EventPresenter {
       this.#replaceFormToLine();
     }
   }
+
+  setSaving = () => {
+    if (this.#mode === Mode.EDITING) {
+      this.#eventEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true
+      });
+    }
+  };
+
+  setDeleting = () => {
+    this.#eventEditComponent.updateElement({
+      isDeleting: true,
+      isDisabled: true
+    });
+  };
+
+  setAborting = () => {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#eventComponent.shake();
+    }
+
+    if (this.#mode === Mode.EDITING) {
+      const resetFormState = () => {
+        this.#eventEditComponent.updateElement({
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false
+        });
+      };
+
+      this.#eventEditComponent.shake(resetFormState);
+    }
+  };
 
   #onEditClick = () => {
     this.#replaceLineToForm();

@@ -1,4 +1,4 @@
-import { DATE_FORMAT, EDIT_TYPE } from '../const.js';
+import { DATE_FORMAT, EditType } from '../const.js';
 import dayjs from 'dayjs';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
@@ -6,6 +6,35 @@ import he from 'he';
 import { capitalizeFirstLetter } from '../utils/event.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
+
+const ButtonLabel = {
+  CANCEL_DEFAULT: 'Cancel',
+  DELETE_DEFAULT: 'Delete',
+  DELETE_IN_PROGRESS: 'Deleting...',
+  SAVE_DEFAULT: 'Save',
+  SAVE_IN_PROGRESS: 'Saving...'
+};
+
+function createSaveButtonTemplate({isSaving, isDisabled}) {
+  const label = isSaving ? ButtonLabel.SAVE_IN_PROGRESS : ButtonLabel.SAVE_DEFAULT;
+  return `<button
+    class="event__save-btn  btn  btn--blue"
+    type="submit"
+    ${isDisabled ? 'disabled' : ''}>${label}</button>`;
+}
+
+function createDeleteButtonTemplate({ editType, isDeleting, isDisabled }) {
+  let label;
+  if (editType === EditType.CREATING) {
+    label = ButtonLabel.CANCEL_DEFAULT;
+  } else {
+    label = isDeleting ? ButtonLabel.DELETE_IN_PROGRESS : ButtonLabel.DELETE_DEFAULT;
+  }
+  return `<button
+    class="event__reset-btn"
+    type="reset"
+    ${isDisabled ? 'disabled' : ''}>${label}</button>`;
+}
 
 function createEventTypeItems(allOffers) {
   let itemsList = '';
@@ -33,7 +62,8 @@ function createDestinationOptions(allDestinations) {
   return optionsList;
 }
 
-function createEventHeaderTemplate({ type, basePrice, destination, dateFrom, dateTo }, editType, allDestinations, allOffers) {
+function createEventHeaderTemplate(event, editType, allDestinations, allOffers) {
+  const { type, basePrice, destination, dateFrom, dateTo, isSaving, isDisabled, isDeleting } = event;
   return (
     `<header class="event__header">
       <div class="event__type-wrapper">
@@ -98,9 +128,11 @@ function createEventHeaderTemplate({ type, basePrice, destination, dateFrom, dat
           id="event-price-1" type="text" name="event-price" value="">
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">${EDIT_TYPE[editType].text}</button>
-      ${editType === 'edit' ? `<button class="event__rollup-btn" type="button">
+      ${createSaveButtonTemplate({isSaving, isDisabled})}
+
+      ${createDeleteButtonTemplate({ editType, isDeleting, isDisabled })}
+
+      ${editType === EditType.EDITING ? `<button class="event__rollup-btn" type="button">
                     <span class="visually-hidden">Open event</span>
                   </button>` : ''}
     </header>`
@@ -206,7 +238,7 @@ export default class EventHeaderView extends AbstractStatefulView {
   #dateToChangeHandler = ([userDate]) => {
     this._setState({
       ...this._setState,
-      dateTo: dayjs(userDate).format(DATE_FORMAT.saveFormat)
+      dateTo: new Date(userDate)
     });
     this.#datePickerFrom.set('maxDate', this._state.dateTo);
   };
@@ -238,13 +270,19 @@ export default class EventHeaderView extends AbstractStatefulView {
 
   #priceChangeHandler = (evt) => {
     this.updateElement({
-      basePrice: he.encode(evt.target.value)
+      basePrice: Number(evt.target.value)
     });
   };
 
-  static parseHeaderToState(event) {
-    return {
-      ...event
-    };
-  }
+  static parseHeaderToState = (
+    event, isDisabled = false,
+    isSaving = false,
+    isDeleting = false) => ({
+    ...event,
+    isDisabled,
+    isSaving,
+    isDeleting
+  });
+
+  static parseStateToHeader = (state) => state.event;
 }

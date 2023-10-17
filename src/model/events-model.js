@@ -24,6 +24,8 @@ export default class EventsModel extends Observable {
     try {
       await this.#destinationsModel.init();
       await this.#offersModel.init();
+      await this.#eventsApiService.getDestinations();
+      await this.#eventsApiService.getOffers();
 
       const events = await this.#eventsApiService.events;
 
@@ -35,44 +37,64 @@ export default class EventsModel extends Observable {
     this._notify(UpdateType.INIT);
   }
 
-  updateEvent(updateType, update) {
+  async updateEvent(updateType, update) {
     const index = this.#events.findIndex((event) => event.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t update unexisting event');
     }
 
-    this.#events = [
-      ...this.#events.slice(0, index),
-      update,
-      ...this.#events.slice(index + 1),
-    ];
+    try {
+      const response = await this.#eventsApiService.updateEvent(update);
+      const updatedEvent = this.#adaptToClient(response);
 
-    this._notify(updateType, update);
+      this.#events = [
+        ...this.#events.slice(0, index),
+        updatedEvent,
+        ...this.#events.slice(index + 1),
+      ];
+
+      this._notify(updateType, updatedEvent);
+    } catch(err) {
+      throw new Error('Can\'t update event');
+    }
   }
 
-  addEvent(updateType, update) {
-    this.#events = [
-      update,
-      ...this.#events,
-    ];
+  async addEvent(updateType, update) {
+    try {
+      const response = await this.#eventsApiService.addEvent(update);
+      const updatedEvent = this.#adaptToClient(response);
 
-    this._notify(updateType, update);
+      this.#events = [
+        updatedEvent,
+        ...this.#events,
+      ];
+
+      this._notify(updateType, updatedEvent);
+    } catch (err) {
+      throw new Error('Can\'t add event');
+    }
   }
 
-  deleteEvent(updateType, update) {
+  async deleteEvent(updateType, update) {
     const index = this.#events.findIndex((event) => event.id === update.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting event');
     }
 
-    this.#events = [
-      ...this.#events.slice(0, index),
-      ...this.#events.slice(index + 1),
-    ];
+    try {
+      await this.#eventsApiService.deleteEvent(update);
 
-    this._notify(updateType, update);
+      this.#events = [
+        ...this.#events.slice(0, index),
+        ...this.#events.slice(index + 1),
+      ];
+
+      this._notify(updateType);
+    } catch (err) {
+      throw new Error('Can\'t delete event');
+    }
   }
 
   #adaptToClient(event) {

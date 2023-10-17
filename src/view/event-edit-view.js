@@ -136,12 +136,11 @@ export default class EventEditView extends AbstractStatefulView {
     render(this.#header, this.element, RenderPosition.AFTERBEGIN);
   }
 
-  #submitClickHandler = ({ destination, type, date, dateFrom, dateTo, basePrice }) => {
+  #submitClickHandler = ({ destination, type, dateFrom, dateTo, basePrice }) => {
     this.#onSubmitClick(EventEditView.parseStateToEvent({
       ...this._state,
       destination,
       type,
-      date,
       dateFrom,
       dateTo,
       basePrice
@@ -209,7 +208,7 @@ export default class EventEditView extends AbstractStatefulView {
     return {
       ...event,
       isDestination: event.destination !== null,
-      isOffers: offers.length > 0 && event
+      isOffers: offers.length > 0 && event !== null,
     };
   }
 
